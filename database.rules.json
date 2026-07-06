@@ -1,0 +1,116 @@
+{
+  "rules": {
+    "users": {
+      ".read": "root.child('users').child(auth.uid).child('role').val() === 'admin' || root.child('users').child(auth.uid).child('role').val() === 'super_admin' || root.child('users').child(auth.uid).child('role').val() === 'hr'",
+      "$uid": {
+        ".read": "auth.uid === $uid || root.child('users').child(auth.uid).child('role').val() === 'admin' || root.child('users').child(auth.uid).child('role').val() === 'super_admin' || root.child('users').child(auth.uid).child('role').val() === 'hr'",
+        ".write": "auth.uid === $uid || root.child('users').child(auth.uid).child('role').val() === 'admin' || root.child('users').child(auth.uid).child('role').val() === 'super_admin'"
+      }
+    },
+    "team": {
+      ".read": "true",
+      ".write": "root.child('users').child(auth.uid).child('role').val() === 'admin' || root.child('users').child(auth.uid).child('role').val() === 'super_admin'",
+      "$memberId": {
+        ".write": "root.child('users').child(auth.uid).child('role').val() === 'admin' || root.child('users').child(auth.uid).child('role').val() === 'super_admin'"
+      }
+    },
+    "jobs": {
+      ".read": "true",
+      ".write": "root.child('users').child(auth.uid).child('role').val() === 'admin' || root.child('users').child(auth.uid).child('role').val() === 'super_admin' || root.child('users').child(auth.uid).child('role').val() === 'hr'",
+      "$jobId": {
+        ".write": "root.child('users').child(auth.uid).child('role').val() === 'admin' || root.child('users').child(auth.uid).child('role').val() === 'super_admin' || root.child('users').child(auth.uid).child('role').val() === 'hr'"
+      }
+    },
+    "careerApplications": {
+      ".read": "root.child('users').child(auth.uid).child('role').val() === 'admin' || root.child('users').child(auth.uid).child('role').val() === 'super_admin' || root.child('users').child(auth.uid).child('role').val() === 'hr'",
+      ".write": "auth !== null",
+      "$appId": {
+        ".read": "root.child('users').child(auth.uid).child('role').val() === 'admin' || root.child('users').child(auth.uid).child('role').val() === 'super_admin' || root.child('users').child(auth.uid).child('role').val() === 'hr' || data.child('email').val() === auth.token.email || data.child('userId').val() === auth.uid",
+        ".write": "auth !== null || root.child('users').child(auth.uid).child('role').val() === 'admin' || root.child('users').child(auth.uid).child('role').val() === 'super_admin' || root.child('users').child(auth.uid).child('role').val() === 'hr'"
+      }
+    },
+    "resumes": {
+      ".read": "root.child('users').child(auth.uid).child('role').val() === 'admin' || root.child('users').child(auth.uid).child('role').val() === 'super_admin' || root.child('users').child(auth.uid).child('role').val() === 'hr'",
+      ".write": "auth !== null",
+      "$resumeId": {
+        ".read": "root.child('users').child(auth.uid).child('role').val() === 'admin' || root.child('users').child(auth.uid).child('role').val() === 'super_admin' || root.child('users').child(auth.uid).child('role').val() === 'hr'",
+        ".write": "auth !== null || root.child('users').child(auth.uid).child('role').val() === 'admin' || root.child('users').child(auth.uid).child('role').val() === 'super_admin' || root.child('users').child(auth.uid).child('role').val() === 'hr'"
+      }
+    },
+    "meetings": {
+      ".read": "root.child('users').child(auth.uid).child('role').val() === 'admin' || root.child('users').child(auth.uid).child('role').val() === 'super_admin' || root.child('users').child(auth.uid).child('role').val() === 'hr'",
+      ".write": "auth !== null",
+      "$meetingId": {
+        ".read": "root.child('users').child(auth.uid).child('role').val() === 'admin' || root.child('users').child(auth.uid).child('role').val() === 'super_admin' || root.child('users').child(auth.uid).child('role').val() === 'hr'",
+        ".write": "auth !== null || root.child('users').child(auth.uid).child('role').val() === 'admin' || root.child('users').child(auth.uid).child('role').val() === 'super_admin' || root.child('users').child(auth.uid).child('role').val() === 'hr'"
+      }
+    },
+    "contacts": {
+      ".read": "root.child('users').child(auth.uid).child('role').val() === 'admin' || root.child('users').child(auth.uid).child('role').val() === 'super_admin' || root.child('users').child(auth.uid).child('role').val() === 'hr'",
+      ".write": "auth !== null",
+      "$contactId": {
+        ".read": "root.child('users').child(auth.uid).child('role').val() === 'admin' || root.child('users').child(auth.uid).child('role').val() === 'super_admin' || root.child('users').child(auth.uid).child('role').val() === 'hr'",
+        ".write": "auth !== null || root.child('users').child(auth.uid).child('role').val() === 'admin' || root.child('users').child(auth.uid).child('role').val() === 'super_admin' || root.child('users').child(auth.uid).child('role').val() === 'hr'"
+      }
+    },
+    "blogs": {
+      ".read": "true",
+      ".write": "auth !== null",
+      "$blogId": {
+        ".write": "auth !== null || root.child('users').child(auth.uid).child('role').val() === 'admin' || root.child('users').child(auth.uid).child('role').val() === 'super_admin'"
+      }
+    },
+    "blogViews": {
+      ".read": "true",
+      ".write": "auth !== null",
+      "$blogId": {
+        "$uid": {
+          ".write": "auth.uid === $uid"
+        }
+      }
+    },
+    "blogLikes": {
+      ".read": "true",
+      ".write": "auth !== null",
+      "$blogId": {
+        "$uid": {
+          ".write": "auth.uid === $uid"
+        }
+      }
+    },
+    "caseStudies": {
+      ".read": "true",
+      ".write": "root.child('users').child(auth.uid).child('role').val() === 'admin' || root.child('users').child(auth.uid).child('role').val() === 'super_admin'",
+      "$csId": {
+        ".write": "true"
+      }
+    },
+    "caseStudyComments": {
+      ".read": "true",
+      ".write": "auth !== null",
+      "$csId": {
+        "$commentId": {
+          ".write": "auth !== null || root.child('users').child(auth.uid).child('role').val() === 'admin' || root.child('users').child(auth.uid).child('role').val() === 'super_admin'"
+        }
+      }
+    },
+    "caseStudyViews": {
+      ".read": "true",
+      ".write": "auth !== null",
+      "$csId": {
+        "$uid": {
+          ".write": "auth.uid === $uid"
+        }
+      }
+    },
+    "caseStudyLikes": {
+      ".read": "true",
+      ".write": "auth !== null",
+      "$csId": {
+        "$uid": {
+          ".write": "auth.uid === $uid"
+        }
+      }
+    }
+  }
+}

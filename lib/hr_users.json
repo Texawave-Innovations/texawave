@@ -1,0 +1,14 @@
+[
+  {
+    "email": "hr@texawave.com",
+    "password": "hrpassword",
+    "role": "hr",
+    "name": "Texawave HR"
+  },
+  {
+    "email": "admin@texawave.com",
+    "password": "adminpassword",
+    "role": "admin",
+    "name": "Texawave Admin"
+  }
+]
