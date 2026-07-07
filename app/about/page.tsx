@@ -20,11 +20,15 @@ import {
   Sparkles,
   Layers,
   Linkedin,
+  Mail,
   Lightbulb,
   Target,
   Cpu,
   Eye,
-  Users
+  Users,
+  Briefcase,
+  BookOpen,
+  Network
 } from "lucide-react";
 import { PageChrome } from "@/components/PageChrome";
 
@@ -358,26 +362,30 @@ function GlassCard({ children, className = "", hasTilt = false }: GlassCardProps
 }
 
 
-interface TeamMember {
+
+
+interface CoFounder {
   id: string;
   name: string;
-  department: string;
   role: string;
+  department: string;
   description: string;
-  skills: string[];
-  experience: string;
-  linkedinUrl: string;
-  profileImage: string;
-  displayOrder: number;
+  photoUrl: string;
+  linkedin: string;
+  order: number;
+  email?: string;
+  experience?: string;
 }
 
 const DEPT_MAP: Record<string, { icon: string; label: string }> = {
-  "Software Engineering": { icon: "💻", label: "Software" },
-  "Electrical Engineering": { icon: "⚡", label: "Electrical" },
-  "Mechanical Engineering": { icon: "⚙️", label: "Mechanical" },
-  "Procurement": { icon: "📦", label: "Procurement" },
-  "IoT Engineering": { icon: "📡", label: "IoT" },
-  "Product Design": { icon: "🎨", label: "Design" }
+  "Software Engineering": { icon: "💻", label: "Software Engineering" },
+  "Electrical Engineering": { icon: "⚡", label: "Electrical Engineering" },
+  "Mechanical Engineering": { icon: "⚙️", label: "Mechanical Engineering" },
+  "Procurement & Operations": { icon: "📦", label: "Procurement & Operations" },
+  "Embedded Engineering": { icon: "📡", label: "Embedded Engineering" },
+  "AI & Research": { icon: "🤖", label: "AI Engineering" },
+  "Human Resources": { icon: "👥", label: "Human Resources" },
+  "Operations": { icon: "⚙️", label: "Operations" }
 };
 
 function TeamCanvas() {
@@ -440,7 +448,7 @@ function TeamCanvas() {
         if (p.x < 0 || p.x > width) p.vx *= -1;
         if (p.y < 0 || p.y > height) p.vy *= -1;
 
-        ctx.fillStyle = `rgba(140, 198, 63, ${p.opacity})`;
+        ctx.fillStyle = `rgba(78, 139, 49, ${p.opacity})`;
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
         ctx.fill();
@@ -460,155 +468,110 @@ function TeamCanvas() {
   return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full opacity-40 pointer-events-none" />;
 }
 
-function TeamMemberCard({ member }: { member: TeamMember }) {
-  const cardRef = useRef<HTMLDivElement>(null);
-  const [coords, setCoords] = useState({ x: 0, y: 0 });
-  const [isHovered, setIsHovered] = useState(false);
+interface CoFounderCardProps {
+  cofounder: CoFounder;
+}
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    setCoords({ x, y });
-
-    const xc = rect.width / 2;
-    const yc = rect.height / 2;
-    const angleX = (yc - y) / 14;
-    const angleY = (x - xc) / 14;
-    cardRef.current.style.transform = `perspective(1000px) rotateX(${angleX}deg) rotateY(${angleY}deg) scale3d(1.01, 1.01, 1.01)`;
-  };
-
-  const handleMouseLeave = () => {
-    if (!cardRef.current) return;
-    cardRef.current.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
-    setIsHovered(false);
-  };
-
-  const initials = member.name
+function CoFounderCard({ cofounder }: CoFounderCardProps) {
+  const initials = cofounder.name
     .split(" ")
     .map((n) => n[0])
     .join("")
     .slice(0, 2)
     .toUpperCase();
 
-  const deptInfo = DEPT_MAP[member.department] || { icon: "⚙️", label: "Engineering" };
+  const deptInfo = DEPT_MAP[cofounder.department] || { icon: "⚙️", label: cofounder.department };
 
   return (
-    <div
-      ref={cardRef}
-      onMouseMove={handleMouseMove}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={handleMouseLeave}
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+      whileHover={{ y: -8 }}
+      className="group relative flex flex-col justify-between overflow-hidden rounded-[24px] border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-[#11141A] p-5 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-none transition-all duration-500 hover:border-[#4E8B31]/60 hover:shadow-[0_12px_30px_rgba(78,139,49,0.15)] select-none text-center cursor-default h-full"
       style={{
-        transformStyle: "preserve-3d",
         transform: "translateZ(0)",
-        willChange: "transform",
-        backfaceVisibility: "hidden"
+        willChange: "transform, box-shadow, border-color",
       }}
-      className="relative overflow-hidden rounded-2xl border border-[#E5E7EB] dark:border-neutral-900 bg-white dark:bg-neutral-950 p-5 transition-all duration-500 hover:border-[#8CC63F]/40 group shadow-sm dark:shadow-lg"
     >
-      {isHovered && (
-        <div
-          className="pointer-events-none absolute -inset-px rounded-2xl opacity-100 transition-opacity duration-300 z-10"
-          style={{
-            background: `radial-gradient(180px circle at ${coords.x}px ${coords.y}px, rgba(140, 198, 63, 0.12), transparent 80%)`
-          }}
-        />
-      )}
-
-      <div className="absolute top-0 right-0 w-24 h-24 bg-[#005900]/10 rounded-bl-full blur-xl group-hover:bg-[#005900]/20 transition-all duration-500" />
-
-      <div className="relative">
-        {member.profileImage ? (
-          <div className="relative w-full aspect-[4/5] rounded-xl overflow-hidden border border-neutral-900">
+      <div className="flex flex-col items-center w-full">
+        {/* Large Professional Photo in 4:3 Aspect Ratio */}
+        <div className="relative w-full aspect-[4/3] rounded-[18px] overflow-hidden bg-neutral-100 dark:bg-neutral-900 border border-neutral-150 dark:border-neutral-800/80 mb-5">
+          {cofounder.photoUrl ? (
             <Image
-              src={member.profileImage}
-              alt={member.name}
+              src={cofounder.photoUrl}
+              alt={cofounder.name}
               fill
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+              sizes="(max-width: 640px) 100vw, 300px"
               loading="lazy"
-              className="object-cover transition-transform duration-500 group-hover:scale-105 transform translate-z-0 will-change-transform"
+              className="object-cover transition-transform duration-700 ease-out transform translate-z-0 will-change-transform group-hover:scale-105"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
-            <div className="absolute bottom-2 left-3 right-3 flex justify-between items-center text-[8px] font-mono text-neutral-400">
-              <span>SYS // NOMINAL</span>
-              <span>EXP // {member.experience}</span>
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-[#060A08] to-[#040605] flex items-center justify-center text-2xl font-bold text-[#4E8B31] font-mono">
+              {initials}
             </div>
-          </div>
-        ) : (
-          <div className="team-initials-box relative w-full aspect-[4/5] rounded-xl bg-gradient-to-br from-[#060A08] via-[#0D1612] to-[#040605] border border-neutral-900 flex flex-col justify-between p-4 overflow-hidden group-hover:border-[#8CC63F]/20 transition-colors duration-500">
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(140,198,63,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(140,198,63,0.02)_1px,transparent_1px)] bg-[size:10px_10px]" />
-            <div className="absolute -top-[50%] -left-[50%] w-[200%] h-[200%] bg-[radial-gradient(circle_at_center,rgba(0,89,0,0.05)_0%,transparent_50%)] animate-pulse" />
-
-            <div className="relative font-mono text-[8px] text-neutral-600 tracking-wider flex justify-between select-none">
-              <span>SYSTEM // ENG_DIR</span>
-              <span>{member.id}</span>
-            </div>
-
-            <div className="relative text-center self-center flex items-center justify-center">
-              <span className="team-initials-text text-4xl font-display font-black text-transparent bg-clip-text bg-gradient-to-br from-white to-[#8CC63F] drop-shadow-[0_0_12px_rgba(140,198,63,0.25)] tracking-tighter">
-                {initials}
-              </span>
-            </div>
-
-            <div className="relative font-mono text-[8px] text-neutral-600 tracking-widest uppercase flex justify-between select-none">
-              <span>DEP // {deptInfo.label}</span>
-              <span>EXP // {member.experience}</span>
-            </div>
-          </div>
-        )}
-
-        <div className="absolute top-2.5 right-2.5 z-10 px-2 py-0.5 text-[8px] font-mono font-bold uppercase tracking-wider rounded bg-black/75 text-[#8CC63F] border border-[#8CC63F]/30 backdrop-blur-md">
-          {member.experience}
-        </div>
-      </div>
-
-      <div className="mt-4 text-left">
-        <div className="flex items-center justify-between gap-2">
-          <h3 className="font-display font-bold text-base text-[#010101] dark:text-white group-hover:text-[#8CC63F] transition-colors duration-300 truncate">
-            {member.name}
-          </h3>
-          {member.linkedinUrl && (
-            <a
-              href={member.linkedinUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="text-[#9CA3AF] dark:text-neutral-500 hover:text-[#8CC63F] dark:hover:text-white transition-colors duration-300 relative z-20"
-              title={`${member.name} LinkedIn Profile`}
-            >
-              <Linkedin size={14} />
-            </a>
           )}
         </div>
 
-        <div className="flex items-center gap-1.5 mt-1 text-[10px] font-mono text-neutral-500 select-none">
-          <span>{deptInfo.icon}</span>
-          <span className="truncate">{member.department}</span>
-        </div>
+        {/* Details (Centered) */}
+        <div className="flex flex-col items-center">
+          <h3 className="font-display font-bold text-lg text-neutral-900 dark:text-white leading-tight mb-1 group-hover:text-[#4E8B31] transition-colors duration-300">
+            {cofounder.name}
+          </h3>
 
-        <div className="text-xs font-semibold text-[#8CC63F]/90 mt-1">
-          {member.role}
-        </div>
+          <span className="text-xs font-semibold text-[#4E8B31] mb-2.5">
+            {cofounder.role}
+          </span>
 
-        <p className="text-[11px] text-[#4B5563] dark:text-neutral-400 mt-2.5 leading-relaxed line-clamp-3">
-          {member.description}
-        </p>
-
-        <div className="flex flex-wrap gap-1 mt-4">
-          {member.skills.slice(0, 4).map((skill, idx) => (
-            <span
-              key={idx}
-              className="px-2 py-0.5 text-[9px] font-mono rounded bg-[#005900]/15 text-[#8CC63F] border border-[#005900]/30 transition-all duration-300 hover:bg-[#8CC63F]/10"
-            >
-              {skill}
-            </span>
-          ))}
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-neutral-100 dark:bg-neutral-800 text-[10px] font-mono text-neutral-600 dark:text-neutral-300 font-medium tracking-wide">
+            <span>{deptInfo.icon}</span>
+            <span>{deptInfo.label}</span>
+          </div>
         </div>
       </div>
-    </div>
+
+      {/* Social Icons at the bottom (Centered) */}
+      <div className="w-full mt-5 flex flex-col items-center">
+        <div 
+          className="flex items-center justify-center gap-3 transition-transform duration-500 ease-out group-hover:-translate-y-1"
+        >
+          {cofounder.linkedin ? (
+            <a
+              href={cofounder.linkedin}
+              target="_blank"
+              rel="noreferrer"
+              className="w-8 h-8 rounded-full border border-neutral-200 dark:border-neutral-800 flex items-center justify-center text-neutral-500 dark:text-neutral-400 hover:text-white hover:bg-[#4E8B31] hover:border-transparent hover:shadow-[0_2px_8px_rgba(78,139,49,0.25)] transition-all duration-300 focus:outline-none"
+              aria-label={`${cofounder.name} LinkedIn Profile`}
+            >
+              <Linkedin size={13} />
+            </a>
+          ) : (
+            <div className="w-8 h-8 rounded-full border border-neutral-100 dark:border-neutral-800/40 flex items-center justify-center text-neutral-200 dark:text-neutral-700/40 pointer-events-none">
+              <Linkedin size={13} />
+            </div>
+          )}
+
+          {cofounder.email ? (
+            <a
+              href={`mailto:${cofounder.email}`}
+              className="w-8 h-8 rounded-full border border-neutral-200 dark:border-neutral-800 flex items-center justify-center text-neutral-500 dark:text-neutral-400 hover:text-white hover:bg-[#4E8B31] hover:border-transparent hover:shadow-[0_2px_8px_rgba(78,139,49,0.25)] transition-all duration-300 focus:outline-none"
+              aria-label={`Email ${cofounder.name}`}
+            >
+              <Mail size={13} />
+            </a>
+          ) : (
+            <div className="w-8 h-8 rounded-full border border-neutral-100 dark:border-neutral-800/40 flex items-center justify-center text-neutral-200 dark:text-neutral-700/40 pointer-events-none">
+              <Mail size={13} />
+            </div>
+          )}
+        </div>
+      </div>
+    </motion.div>
   );
 }
+
+
 
 // ==========================================
 // 4. MAIN ABOUT PAGE
@@ -647,7 +610,7 @@ export default function AboutPage() {
   ];
 
   // Team Section States
-  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
+  const [cofounders, setCofounders] = useState<CoFounder[]>([]);
   const [teamLoading, setTeamLoading] = useState(true);
 
   // Fetch Team Members from Firebase RTDB in real-time
@@ -657,28 +620,19 @@ export default function AboutPage() {
       setTeamLoading(true);
       if (snapshot.exists()) {
         const data = snapshot.val();
-        const loadedTeam = Object.keys(data).map(key => ({
-          id: key,
-          name: data[key].name || "",
-          department: data[key].department || "",
-          role: data[key].designation || "",
-          description: data[key].description || "",
-          skills: data[key].skills || [],
-          experience: data[key].experience || "",
-          linkedinUrl: data[key].linkedin || "",
-          profileImage: data[key].imageUrl || "",
-          displayOrder: data[key].order || 0,
-          active: data[key].active !== undefined ? data[key].active : true
-        }));
-
-        // Filter out inactive (hidden) members and sort by displayOrder
-        const activeMembers = loadedTeam
-          .filter(member => member.active !== false)
-          .sort((a, b) => a.displayOrder - b.displayOrder);
-          
-        setTeamMembers(activeMembers);
+        
+        // Co-founders
+        if (data.leadership && data.leadership.cofounders) {
+          const loadedCf = Object.entries(data.leadership.cofounders)
+            .map(([key, val]: [string, any]) => ({ id: key, ...val }))
+            .filter(c => c.active !== false)
+            .sort((a, b) => (a.order || 0) - (b.order || 0));
+          setCofounders(loadedCf);
+        } else {
+          setCofounders([]);
+        }
       } else {
-        setTeamMembers([]);
+        setCofounders([]);
       }
       setTeamLoading(false);
     }, (err) => {
@@ -688,8 +642,6 @@ export default function AboutPage() {
 
     return () => unsubscribe();
   }, []);
-
-  const filteredMembers = teamMembers;
 
   // GSAP Entrance Animations & Magnetic Button Effect
   useEffect(() => {
@@ -1209,60 +1161,47 @@ transform ideas into market-ready products.
             SECTION: STATS & MEET THE MINDS
             ========================================== */}
 
-        {/* Meet The Minds Section */}
+        {/* Redesigned Team Section */}
         <section id="our-team" className="about-team-section relative bg-[#000000] py-28 px-[clamp(1rem,4vw,4rem)] border-b border-neutral-900 z-20 overflow-hidden">
-          {/* Cyber Canvas Background specifically for Team section */}
+          {/* Cyber Canvas Background */}
           <TeamCanvas />
           
           {/* Subtle Glows */}
-          <div className="absolute top-[10%] left-[-10%] w-[300px] h-[300px] rounded-full bg-[#005900]/10 blur-[80px] pointer-events-none" />
-          <div className="absolute bottom-[10%] right-[-10%] w-[300px] h-[300px] rounded-full bg-[#8CC63F]/5 blur-[90px] pointer-events-none" />
+          <div className="absolute top-[10%] left-[-10%] w-[300px] h-[300px] rounded-full bg-[#4E8B31]/10 blur-[80px] pointer-events-none animate-pulse" />
+          <div className="absolute bottom-[10%] right-[-10%] w-[300px] h-[300px] rounded-full bg-[#4E8B31]/5 blur-[90px] pointer-events-none" />
 
-          <div className="max-w-[1400px] mx-auto relative z-10">
+          <div className="max-w-[1400px] mx-auto relative z-10 text-center">
             {/* Section Header */}
-            <div className="text-center max-w-2xl mx-auto mb-16">
-              <span className="text-[11px] font-black uppercase tracking-[0.3em] text-[#8CC63F] inline-block mb-3">
+            <div className="max-w-2xl mx-auto mb-16">
+              <span className="text-[11px] font-black uppercase tracking-[0.3em] text-[#4E8B31] inline-block mb-3">
                 THE PEOPLE BEHIND TEXAWAVE
               </span>
               <h2 className="font-display font-bold text-section text-white mb-4">
-                Meet the Minds
+                Leadership Team
               </h2>
               <p className="text-[#AAAAAA] text-sm md:text-base leading-relaxed">
-                Our multidisciplinary engineers, designers, and innovators collaborate to transform ideas into world-class products and digital experiences.
+                Meet the engineers and visionaries leading Texawave&apos;s mission to build world-class products.
               </p>
             </div>
 
-
-            {/* Team Grid */}
             {teamLoading ? (
               <div className="py-20 flex flex-col items-center justify-center text-[#AAAAAA]">
-                <div className="h-8 w-8 border-2 border-[#8CC63F] border-t-transparent rounded-full animate-spin mb-4" />
+                <div className="h-8 w-8 border-2 border-[#4E8B31] border-t-transparent rounded-full animate-spin mb-4" />
                 <p className="text-xs font-bold uppercase tracking-wider font-mono">Assembling crew dashboard...</p>
               </div>
-            ) : filteredMembers.length === 0 ? (
-              <div className="py-16 text-center border border-dashed border-neutral-800 rounded-2xl bg-neutral-950/20">
-                <p className="text-xs font-mono text-neutral-500">No team members active in this division.</p>
-              </div>
             ) : (
-              <motion.div
-                layout
-                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
-              >
-                <AnimatePresence mode="popLayout">
-                  {filteredMembers.map((member) => (
-                    <motion.div
-                      layout
-                      key={member.id}
-                      initial={{ opacity: 0, y: 30 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, scale: 0.95 }}
-                      transition={{ duration: 0.4 }}
-                    >
-                      <TeamMemberCard member={member} />
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
-              </motion.div>
+              <>
+                {/* 2. Co-Founders grid/flex (Desktop: 4 columns, Tablet: 2 columns, Mobile: 1 column, Centered if fewer than 4) */}
+                {cofounders.length > 0 && (
+                  <div className="flex flex-wrap justify-center gap-6 mb-24 max-w-7xl mx-auto">
+                    {cofounders.map((cf) => (
+                      <div key={cf.id} className="w-full max-w-[280px] md:w-[calc(50%-12px)] lg:w-[calc(25%-18px)] flex-shrink-0">
+                        <CoFounderCard cofounder={cf} />
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
             )}
           </div>
         </section>
