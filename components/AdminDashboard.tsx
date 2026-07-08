@@ -63,6 +63,7 @@ export default function AdminDashboard() {
   const [csResultsImpact, setCsResultsImpact] = useState("");
   const [csGallery, setCsGallery] = useState("");
   const [csStatus, setCsStatus] = useState<"Draft" | "Published">("Draft");
+  const [csShowOnHomepage, setCsShowOnHomepage] = useState(false);
 
   // Blog Submissions States
   const [articles, setArticles] = useState<CommunityArticle[]>([]);
@@ -545,6 +546,7 @@ export default function AdminDashboard() {
     setCsResultsImpact(cs.resultsImpact);
     setCsGallery(cs.gallery ? cs.gallery.join(", ") : "");
     setCsStatus(cs.status);
+    setCsShowOnHomepage(cs.showOnHomepage || false);
     setShowCSModal(true);
   };
 
@@ -562,6 +564,7 @@ export default function AdminDashboard() {
     setCsResultsImpact("");
     setCsGallery("");
     setCsStatus("Draft");
+    setCsShowOnHomepage(false);
   };
 
   const handleCSSubmit = async (e: React.FormEvent) => {
@@ -587,7 +590,8 @@ export default function AdminDashboard() {
       mechanicalEngineering: csMechanicalEngineering,
       resultsImpact: csResultsImpact,
       gallery: galleryArray,
-      status: csStatus
+      status: csStatus,
+      showOnHomepage: csShowOnHomepage
     };
 
     try {
@@ -1964,7 +1968,7 @@ export default function AdminDashboard() {
                         <th className="p-4 w-44 text-right">Actions</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-white/5 font-sans font-medium text-white/95">
+                    <tbody className="divide-y divide-white/5 font-sans font-medium text-text-primary">
                       {caseStudies
                         .filter(cs => {
                           const matchesSearch = (cs.title || "").toLowerCase().includes(csSearch.toLowerCase()) || (cs.category || "").toLowerCase().includes(csSearch.toLowerCase());
@@ -1978,8 +1982,15 @@ export default function AdminDashboard() {
                                 <img src={cs.heroImage || "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80"} alt="" className="object-cover h-full w-full" />
                               </div>
                             </td>
-                            <td className="p-4 font-bold max-w-xs truncate text-sm">
-                              {cs.title}
+                            <td className="p-4 font-bold max-w-sm text-sm">
+                              <div className="flex flex-col gap-1.5 items-start">
+                                <span className="whitespace-normal break-words leading-tight">{cs.title}</span>
+                                {cs.showOnHomepage && (
+                                  <span className="inline-flex items-center gap-0.5 rounded-full bg-[#8CC63F]/10 border border-[#8CC63F]/20 text-[#8CC63F] text-[9px] px-2 py-0.5 uppercase tracking-wider font-mono shrink-0">
+                                    <Globe size={9} /> Homepage
+                                  </span>
+                                )}
+                              </div>
                             </td>
                             <td className="p-4 font-semibold text-text-secondary text-xs">
                               {cs.category}
@@ -2551,6 +2562,19 @@ export default function AdminDashboard() {
                     <option value="Draft">Draft (Only Admins can view)</option>
                     <option value="Published">Published (Public view)</option>
                   </select>
+
+                  <div className="mt-6 flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      id="csShowOnHomepage"
+                      checked={csShowOnHomepage}
+                      onChange={(e) => setCsShowOnHomepage(e.target.checked)}
+                      className="h-4.5 w-4.5 rounded border-white/10 bg-bg-primary text-[#8CC63F] focus:ring-[#8CC63F] cursor-pointer"
+                    />
+                    <label htmlFor="csShowOnHomepage" className="text-xs font-bold uppercase tracking-wider text-text-secondary font-mono cursor-pointer select-none">
+                      Show on Homepage
+                    </label>
+                  </div>
 
                   <button
                     type="submit"

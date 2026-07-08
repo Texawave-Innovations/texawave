@@ -480,97 +480,67 @@ function CoFounderCard({ cofounder }: CoFounderCardProps) {
     .slice(0, 2)
     .toUpperCase();
 
-  const deptInfo = DEPT_MAP[cofounder.department] || { icon: "⚙️", label: cofounder.department };
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
       transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-      whileHover={{ y: -8 }}
-      className="group relative flex flex-col justify-between overflow-hidden rounded-[24px] border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-[#11141A] p-5 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-none transition-all duration-500 hover:border-[#4E8B31]/60 hover:shadow-[0_12px_30px_rgba(78,139,49,0.15)] select-none text-center cursor-default h-full"
-      style={{
-        transform: "translateZ(0)",
-        willChange: "transform, box-shadow, border-color",
-      }}
+      className="group relative flex flex-col items-center text-center select-none cursor-default h-full"
     >
-      <div className="flex flex-col items-center w-full">
-        {/* Large Professional Photo in 4:3 Aspect Ratio */}
-        <div className="relative w-full aspect-[4/3] rounded-[18px] overflow-hidden bg-neutral-100 dark:bg-neutral-900 border border-neutral-150 dark:border-neutral-800/80 mb-5">
+      {/* Photo — circular frame with premium double-ring border (white inner, green outer) */}
+      <div className="relative w-40 h-40 md:w-44 md:h-44 mb-6 shrink-0">
+        {/* Outer green ring with soft glow */}
+        <div className="absolute -inset-[6px] rounded-full bg-gradient-to-br from-[#8CC63F] via-[#6BAF2E] to-[#4E8B31] shadow-[0_0_24px_rgba(140,198,63,0.35)] transition-all duration-500 group-hover:shadow-[0_0_34px_rgba(140,198,63,0.55)] group-hover:-inset-[8px]" />
+        {/* Inner white ring */}
+        <div className="absolute -inset-[2px] rounded-full bg-white" />
+        {/* Photo */}
+        <div className="relative w-full h-full rounded-full overflow-hidden">
           {cofounder.photoUrl ? (
             <Image
               src={cofounder.photoUrl}
               alt={cofounder.name}
               fill
-              sizes="(max-width: 640px) 100vw, 300px"
+              sizes="176px"
               loading="lazy"
-              className="object-cover transition-transform duration-700 ease-out transform translate-z-0 will-change-transform group-hover:scale-105"
+              className="object-cover grayscale-[15%] transition-all duration-700 ease-out group-hover:grayscale-0 group-hover:scale-[1.05]"
             />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-[#060A08] to-[#040605] flex items-center justify-center text-2xl font-bold text-[#4E8B31] font-mono">
+            <div className="w-full h-full flex items-center justify-center text-3xl font-bold text-[#4E8B31]/70 font-mono bg-neutral-900">
               {initials}
             </div>
           )}
         </div>
+      </div>
 
-        {/* Details (Centered) */}
-        <div className="flex flex-col items-center">
-          <h3 className="font-display font-bold text-lg text-neutral-900 dark:text-white leading-tight mb-1 group-hover:text-[#4E8B31] transition-colors duration-300">
+      {/* Name + Role — fixed-height name block so buttons align across cards */}
+      <div className="flex flex-col items-center w-full">
+        <div className="h-[64px] flex items-center justify-center px-2">
+          <h3 className="font-display text-2xl md:text-[26px] font-medium tracking-tight text-white leading-[1.15] text-center group-hover:text-[#8CC63F] transition-colors duration-300">
             {cofounder.name}
           </h3>
-
-          <span className="text-xs font-semibold text-[#4E8B31] mb-2.5">
-            {cofounder.role}
-          </span>
-
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-neutral-100 dark:bg-neutral-800 text-[10px] font-mono text-neutral-600 dark:text-neutral-300 font-medium tracking-wide">
-            <span>{deptInfo.icon}</span>
-            <span>{deptInfo.label}</span>
-          </div>
         </div>
+        <span className="font-mono text-xs md:text-[13px] font-bold uppercase tracking-[0.15em] text-[#8CC63F] mb-4">
+          {cofounder.role}
+        </span>
       </div>
 
-      {/* Social Icons at the bottom (Centered) */}
-      <div className="w-full mt-5 flex flex-col items-center">
-        <div 
-          className="flex items-center justify-center gap-3 transition-transform duration-500 ease-out group-hover:-translate-y-1"
+      {/* LinkedIn button */}
+      {cofounder.linkedin && (
+        <a
+          href={cofounder.linkedin}
+          target="_blank"
+          rel="noreferrer"
+          aria-label={`${cofounder.name} LinkedIn Profile`}
+          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-neutral-700 text-black bg-white text-[11px] font-mono font-semibold uppercase tracking-wider transition-all duration-300 hover:border-[#8CC63F] hover:bg-[#8CC63F]/10 hover:shadow-[0_0_16px_rgba(140,198,63,0.25)] hover:-translate-y-0.5"
         >
-          {cofounder.linkedin ? (
-            <a
-              href={cofounder.linkedin}
-              target="_blank"
-              rel="noreferrer"
-              className="w-8 h-8 rounded-full border border-neutral-200 dark:border-neutral-800 flex items-center justify-center text-neutral-500 dark:text-neutral-400 hover:text-white hover:bg-[#4E8B31] hover:border-transparent hover:shadow-[0_2px_8px_rgba(78,139,49,0.25)] transition-all duration-300 focus:outline-none"
-              aria-label={`${cofounder.name} LinkedIn Profile`}
-            >
-              <Linkedin size={13} />
-            </a>
-          ) : (
-            <div className="w-8 h-8 rounded-full border border-neutral-100 dark:border-neutral-800/40 flex items-center justify-center text-neutral-200 dark:text-neutral-700/40 pointer-events-none">
-              <Linkedin size={13} />
-            </div>
-          )}
-
-          {cofounder.email ? (
-            <a
-              href={`mailto:${cofounder.email}`}
-              className="w-8 h-8 rounded-full border border-neutral-200 dark:border-neutral-800 flex items-center justify-center text-neutral-500 dark:text-neutral-400 hover:text-white hover:bg-[#4E8B31] hover:border-transparent hover:shadow-[0_2px_8px_rgba(78,139,49,0.25)] transition-all duration-300 focus:outline-none"
-              aria-label={`Email ${cofounder.name}`}
-            >
-              <Mail size={13} />
-            </a>
-          ) : (
-            <div className="w-8 h-8 rounded-full border border-neutral-100 dark:border-neutral-800/40 flex items-center justify-center text-neutral-200 dark:text-neutral-700/40 pointer-events-none">
-              <Mail size={13} />
-            </div>
-          )}
-        </div>
-      </div>
+          <Linkedin size={13} strokeWidth={2} />
+          LinkedIn
+        </a>
+      )}
     </motion.div>
   );
 }
-
 
 
 // ==========================================
@@ -820,56 +790,29 @@ export default function AboutPage() {
         style={{ contentVisibility: "auto" }}
         className="about-us-page bg-[#F8F9FB] dark:bg-[#0F1115] text-[#010101] dark:text-[#EEEEEE] font-sans antialiased overflow-hidden min-h-screen relative z-10"
       >
-        {/* Subtle Cyber Grid Background */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(0,0,0,0.025)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.025)_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none" />
-
-        {/* Dynamic Glow Orbs matching homepage */}
-        <div className="absolute top-[20%] left-[-10%] w-[500px] h-[500px] rounded-full bg-[#8CC63F]/8 dark:bg-[#8CC63F]/12 blur-[130px] pointer-events-none animate-pulse" />
-        <div className="absolute bottom-[30%] right-[-10%] w-[600px] h-[600px] rounded-full bg-[#14B8A6]/3 dark:bg-[#14B8A6]/4 blur-[150px] pointer-events-none" />
-
         {/* ==========================================
             SECTION 1 — HERO INTRODUCTION
             ========================================== */}
-        <section className="hero-section relative min-h-[calc(100vh-110px)] flex items-center py-20 px-[clamp(1rem,4vw,4rem)] max-w-[1400px] mx-auto grid lg:grid-cols-12 gap-12 items-center">
-          <div className="lg:col-span-6 z-20 flex flex-col justify-center">
+        <section className="hero-section relative flex items-center py-16 px-[clamp(1rem,4vw,4rem)] max-w-[1100px] mx-auto">
+          <div className="w-full flex flex-col justify-center">
             <span className="reveal-hero-text text-[12px] font-black uppercase tracking-[0.25em] text-[#8CC63F] inline-block mb-4">
               About Texawave
             </span>
-            <h1 className="reveal-hero-text font-display font-bold text-hero leading-[1.05] tracking-tight text-[#010101] dark:text-white mb-6">
-              Shaping the Future <br />
-              Through <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#010101] dark:from-white via-[#8CC63F] to-[#14B8A6]">Engineering</span> <br />
-              Excellence
+            <h1 className="reveal-hero-text font-display font-bold text-hero leading-[1.1] tracking-tight text-[#010101] dark:text-white mb-6">
+              Shaping the Future Through 
+              <span className="text-[#8CC63F]"> Engineering Excellence</span>
             </h1>
-            <p className="reveal-hero-text text-body-large text-[#4B5563] dark:text-[#CCCCCC] leading-relaxed max-w-xl">
-              TexaWave was founded with a simple belief: Great products are built when engineering disciplines work together. Businesses often struggle with multiple vendors for software, electronics, mechanical design, procurement, and manufacturing.
-
-
-TexaWave brings these disciplines together
-
-under one roof, helping organizations
-
-transform ideas into market-ready products.
+            <p className="reveal-hero-text text-body-large text-[#4B5563] dark:text-[#CCCCCC] leading-relaxed max-w-2xl">
+              TexaWave was founded with a simple belief: Great products are built when engineering disciplines work together. Businesses often struggle with multiple vendors for software, electronics, mechanical design, procurement, and manufacturing. TexaWave brings these disciplines together under one roof, helping organizations transform ideas into market-ready products.
             </p>
-          </div>
-
-          <div className="lg:col-span-6 relative w-full h-[350px] sm:h-[450px] lg:h-[550px] flex items-center justify-center border border-[#E5E7EB] dark:border-neutral-900 rounded-3xl bg-white/60 dark:bg-neutral-950/20 backdrop-blur-sm overflow-hidden group shadow-md dark:shadow-[inset_0_0_40px_rgba(0,0,0,0.8)]">
-            {/* Absolute overlay visual details */}
-            <div className="absolute top-4 left-4 font-mono text-[9px] text-neutral-600 tracking-wider uppercase select-none">
-              Texawave Engine // Vis_Active
-            </div>
-            <div className="absolute bottom-4 right-4 font-mono text-[9px] text-neutral-600 select-none">
-              [SYSTEM_STATUS: NOMINAL]
-            </div>
-            {/* Engineering Canvas rendering */}
-            <EngineeringCanvas />
           </div>
         </section>
 
         {/* ==========================================
             SECTION 2 — MISSION & VISION
             ========================================== */}
-        <section className="mission-section py-24 px-[clamp(1rem,4vw,4rem)] max-w-[1400px] mx-auto border-t border-[#E5E7EB] dark:border-neutral-900/50">
-          <div className="text-center max-w-2xl mx-auto mb-16">
+        <section className="mission-section py-16 px-[clamp(1rem,4vw,4rem)] max-w-[1100px] mx-auto border-t border-[#E5E7EB] dark:border-neutral-900/50">
+          <div className="text-center max-w-2xl mx-auto mb-10">
             <h2 className="font-display font-bold text-section text-[#010101] dark:text-white mb-4">Mission & Vision</h2>
           </div>
           <div className="reveal-mission-cards grid md:grid-cols-2 gap-8 lg:gap-12">
@@ -924,24 +867,10 @@ transform ideas into market-ready products.
         {/* ==========================================
             SECTION 2.5 — CORE PRINCIPLES
             ========================================== */}
-        <section className="principles-section relative py-24 px-[clamp(1rem,4vw,4rem)] max-w-[1400px] mx-auto border-t border-[#E5E7EB] dark:border-neutral-900/50 overflow-hidden">
-          {/* Subtle engineering-style background pattern */}
-          <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-30 dark:opacity-50">
-            <svg className="absolute w-full h-full" xmlns="http://www.w3.org/2000/svg">
-              <defs>
-                <pattern id="principles-grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                  <circle cx="2" cy="2" r="1" fill="rgba(140, 198, 63, 0.15)" />
-                  <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(140, 198, 63, 0.04)" strokeWidth="1" />
-                </pattern>
-              </defs>
-              <rect width="100%" height="100%" fill="url(#principles-grid)" />
-            </svg>
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_30%,#F8F9FB_100%)] dark:bg-[radial-gradient(circle_at_center,transparent_30%,#0F1115_100%)] pointer-events-none" />
-          </div>
-
+        <section className="principles-section relative py-16 px-[clamp(1rem,4vw,4rem)] max-w-[1200px] mx-auto border-t border-[#E5E7EB] dark:border-neutral-900/50">
           <div className="relative z-10">
             {/* Section Header */}
-            <div className="text-center max-w-2xl mx-auto mb-16">
+            <div className="text-center max-w-2xl mx-auto mb-10">
               <span className="text-[11px] font-black uppercase tracking-[0.25em] text-[#8CC63F] inline-block mb-3">
                 Values
               </span>
@@ -991,8 +920,8 @@ transform ideas into market-ready products.
         {/* ==========================================
             SECTION 3 — ENGINEERING SERVICES
             ========================================== */}
-        <section className="py-28 px-[clamp(1rem,4vw,4rem)] max-w-[1400px] mx-auto border-t border-[#E5E7EB] dark:border-neutral-900/50">
-          <div className="text-center max-w-2xl mx-auto mb-20">
+        <section className="py-16 px-[clamp(1rem,4vw,4rem)] max-w-[1400px] mx-auto border-t border-[#E5E7EB] dark:border-neutral-900/50">
+          <div className="text-center max-w-2xl mx-auto mb-12">
             <span className="text-[11px] font-black uppercase tracking-[0.25em] text-[#8CC63F] inline-block mb-3">Ecosystem</span>
             <h2 className="font-display font-bold text-section text-[#010101] dark:text-white mb-4">Engineering Services</h2>
             <p className="text-[#4B5563] dark:text-[#AAAAAA]">A multi-disciplinary stack designed to build, scale, and secure complex hardware and software systems.</p>
@@ -1162,17 +1091,10 @@ transform ideas into market-ready products.
             ========================================== */}
 
         {/* Redesigned Team Section */}
-        <section id="our-team" className="about-team-section relative bg-[#000000] py-28 px-[clamp(1rem,4vw,4rem)] border-b border-neutral-900 z-20 overflow-hidden">
-          {/* Cyber Canvas Background */}
-          <TeamCanvas />
-          
-          {/* Subtle Glows */}
-          <div className="absolute top-[10%] left-[-10%] w-[300px] h-[300px] rounded-full bg-[#4E8B31]/10 blur-[80px] pointer-events-none animate-pulse" />
-          <div className="absolute bottom-[10%] right-[-10%] w-[300px] h-[300px] rounded-full bg-[#4E8B31]/5 blur-[90px] pointer-events-none" />
-
+        <section id="our-team" className="about-team-section relative bg-[#000000] py-16 px-[clamp(1rem,4vw,4rem)] border-b border-neutral-900 z-20">
           <div className="max-w-[1400px] mx-auto relative z-10 text-center">
             {/* Section Header */}
-            <div className="max-w-2xl mx-auto mb-16">
+            <div className="max-w-2xl mx-auto mb-12">
               <span className="text-[11px] font-black uppercase tracking-[0.3em] text-[#4E8B31] inline-block mb-3">
                 THE PEOPLE BEHIND TEXAWAVE
               </span>
@@ -1210,7 +1132,7 @@ transform ideas into market-ready products.
         {/* ==========================================
             SECTION 6 — FINAL CTA SECTION
             ========================================== */}
-        <section className="relative py-32 px-[clamp(1rem,4vw,4rem)] border-t border-neutral-900/50 bg-[radial-gradient(ellipse_at_center,rgba(140,198,63,0.08)_0%,transparent_70%)] overflow-hidden">
+        <section className="relative py-20 px-[clamp(1rem,4vw,4rem)] border-t border-neutral-900/50">
           <div className="max-w-[1400px] mx-auto text-center relative z-20">
             <h2 className="font-display font-bold text-section text-[#010101] dark:text-white mb-6 leading-tight max-w-2xl mx-auto">
               One Partner. <span className="text-[#8CC63F]">Infinite</span>

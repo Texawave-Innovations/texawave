@@ -3,7 +3,7 @@ import path from "path";
 import { notFound } from "next/navigation";
 import { PageChrome } from "@/components/PageChrome";
 import { CaseStudyDetailClient } from "@/components/CaseStudyDetailClient";
-import { ref, get } from "firebase/database";
+import { ref, get, set } from "firebase/database";
 import { db } from "@/lib/firebase";
 
 export const dynamic = "force-dynamic";
@@ -13,26 +13,43 @@ interface Props {
 }
 
 async function getCaseStudiesFromDb() {
-  // Read from JSON (same source as the API route) first
-  const dbPath = path.join(process.cwd(), "lib", "case_studies.json");
-  if (fs.existsSync(dbPath)) {
-    try {
-      const studies = JSON.parse(fs.readFileSync(dbPath, "utf-8"));
-      if (studies.length > 0) return studies;
-    } catch (fileErr) {
-      console.error(fileErr);
-    }
-  }
-
-  // Fallback to Firebase if JSON is empty
   try {
-    const snapshot = await get(ref(db, "caseStudies"));
+    const csRef = ref(db, "caseStudies");
+    const snapshot = await get(csRef);
     if (snapshot.exists()) {
       const data = snapshot.val();
-      return Object.keys(data).map(key => ({ id: key, ...data[key] }));
+      return Object.keys(data).map(key => ({
+        id: key,
+        ...data[key]
+      }));
+    } else {
+      // Seed if database node is blank
+      const dbPath = path.join(process.cwd(), "lib", "case_studies.json");
+      if (fs.existsSync(dbPath)) {
+        try {
+          const fileContent = fs.readFileSync(dbPath, "utf-8");
+          const studies = JSON.parse(fileContent);
+          for (const study of studies) {
+            await set(ref(db, `caseStudies/${study.id}`), study);
+          }
+          return studies;
+        } catch (fileErr) {
+          console.error("Error seeding case studies in slug page", fileErr);
+        }
+      }
     }
   } catch (err) {
     console.error("Error reading case studies from Firebase in detail page", err);
+    // Fallback to local file
+    const dbPath = path.join(process.cwd(), "lib", "case_studies.json");
+    if (fs.existsSync(dbPath)) {
+      try {
+        const data = fs.readFileSync(dbPath, "utf-8");
+        return JSON.parse(data);
+      } catch (fileErr) {
+        console.error("Error reading case studies file fallback in slug page", fileErr);
+      }
+    }
   }
 
   return [];

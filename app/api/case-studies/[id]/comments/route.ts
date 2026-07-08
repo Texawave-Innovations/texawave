@@ -1,19 +1,45 @@
 import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
+import { ref, get, set, update, remove } from "firebase/database";
+import { db } from "@/lib/firebase";
 
 const dbPath = path.join(process.cwd(), "lib", "case_studies.json");
 
-function readCaseStudies() {
-  if (!fs.existsSync(dbPath)) {
-    return [];
+async function getCaseStudiesFromDb() {
+  try {
+    const csRef = ref(db, "caseStudies");
+    const snapshot = await get(csRef);
+    if (snapshot.exists()) {
+      const data = snapshot.val();
+      return Object.keys(data).map(key => ({
+        id: key,
+        ...data[key]
+      }));
+    } else {
+      // Seed if database node is blank
+      if (fs.existsSync(dbPath)) {
+        const fileContent = fs.readFileSync(dbPath, "utf-8");
+        const studies = JSON.parse(fileContent);
+        for (const study of studies) {
+          await set(ref(db, `caseStudies/${study.id}`), study);
+        }
+        return studies;
+      }
+    }
+  } catch (err) {
+    console.error("Error reading case studies from Firebase in comments API", err);
+    // Fallback to local JSON file
+    if (fs.existsSync(dbPath)) {
+      try {
+        const fileContent = fs.readFileSync(dbPath, "utf-8");
+        return JSON.parse(fileContent);
+      } catch (fileErr) {
+        console.error("Error reading case studies file fallback in comments API", fileErr);
+      }
+    }
   }
-  const fileContent = fs.readFileSync(dbPath, "utf-8");
-  return JSON.parse(fileContent);
-}
-
-function writeCaseStudies(data: any[]) {
-  fs.writeFileSync(dbPath, JSON.stringify(data, null, 2), "utf-8");
+  return [];
 }
 
 function isAdmin(request: Request) {
@@ -36,29 +62,24 @@ export async function POST(
       );
     }
 
-    const studies = readCaseStudies();
-    const index = studies.findIndex((s: any) => s.id === id || s.slug === id);
+    const studies = await getCaseStudiesFromDb();
+    const study = studies.find((s: any) => s.id === id || s.slug === id);
 
-    if (index === -1) {
+    if (!study) {
       return NextResponse.json({ success: false, error: "Case study not found" }, { status: 404 });
     }
 
+    const commentId = `comm-${Date.now()}`;
     const newComment = {
-      id: `comm-${Date.now()}`,
       userName,
       content,
       dateSubmitted: new Date().toISOString().split("T")[0],
       approved: true
     };
 
-    if (!studies[index].comments) {
-      studies[index].comments = [];
-    }
+    await set(ref(db, `caseStudyComments/${study.id}/${commentId}`), newComment);
 
-    studies[index].comments.push(newComment);
-    writeCaseStudies(studies);
-
-    return NextResponse.json({ success: true, comment: newComment });
+    return NextResponse.json({ success: true, comment: { id: commentId, ...newComment } });
   } catch (error: any) {
     return NextResponse.json(
       { success: false, error: error.message || "Failed to submit comment" },
@@ -83,23 +104,20 @@ export async function DELETE(
       return NextResponse.json({ success: false, error: "Comment ID is required" }, { status: 400 });
     }
 
-    const studies = readCaseStudies();
-    const index = studies.findIndex((s: any) => s.id === id || s.slug === id);
+    const studies = await getCaseStudiesFromDb();
+    const study = studies.find((s: any) => s.id === id || s.slug === id);
 
-    if (index === -1) {
+    if (!study) {
       return NextResponse.json({ success: false, error: "Case study not found" }, { status: 404 });
     }
 
-    const initialCount = studies[index].comments?.length || 0;
-    studies[index].comments = (studies[index].comments || []).filter(
-      (c: any) => c.id !== commentId
-    );
-
-    if (studies[index].comments.length === initialCount) {
+    const commentRef = ref(db, `caseStudyComments/${study.id}/${commentId}`);
+    const snapshot = await get(commentRef);
+    if (!snapshot.exists()) {
       return NextResponse.json({ success: false, error: "Comment not found" }, { status: 404 });
     }
 
-    writeCaseStudies(studies);
+    await remove(commentRef);
 
     return NextResponse.json({ success: true, message: "Comment deleted successfully" });
   } catch (error: any) {
@@ -129,23 +147,22 @@ export async function PUT(
       );
     }
 
-    const studies = readCaseStudies();
-    const index = studies.findIndex((s: any) => s.id === id || s.slug === id);
+    const studies = await getCaseStudiesFromDb();
+    const study = studies.find((s: any) => s.id === id || s.slug === id);
 
-    if (index === -1) {
+    if (!study) {
       return NextResponse.json({ success: false, error: "Case study not found" }, { status: 404 });
     }
 
-    const comment = (studies[index].comments || []).find((c: any) => c.id === commentId);
-
-    if (!comment) {
+    const commentRef = ref(db, `caseStudyComments/${study.id}/${commentId}`);
+    const snapshot = await get(commentRef);
+    if (!snapshot.exists()) {
       return NextResponse.json({ success: false, error: "Comment not found" }, { status: 404 });
     }
 
-    comment.approved = approved;
-    writeCaseStudies(studies);
+    await update(commentRef, { approved });
 
-    return NextResponse.json({ success: true, comment });
+    return NextResponse.json({ success: true, comment: { id: commentId, ...snapshot.val(), approved } });
   } catch (error: any) {
     return NextResponse.json(
       { success: false, error: error.message || "Failed to toggle comment approval" },

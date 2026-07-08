@@ -1,19 +1,45 @@
 import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
+import { ref, get, set, update, remove } from "firebase/database";
+import { db } from "@/lib/firebase";
 
 const dbPath = path.join(process.cwd(), "lib", "case_studies.json");
 
-function readCaseStudies() {
-  if (!fs.existsSync(dbPath)) {
-    return [];
+async function getCaseStudiesFromDb() {
+  try {
+    const csRef = ref(db, "caseStudies");
+    const snapshot = await get(csRef);
+    if (snapshot.exists()) {
+      const data = snapshot.val();
+      return Object.keys(data).map(key => ({
+        id: key,
+        ...data[key]
+      }));
+    } else {
+      // Seed if database node is blank
+      if (fs.existsSync(dbPath)) {
+        const fileContent = fs.readFileSync(dbPath, "utf-8");
+        const studies = JSON.parse(fileContent);
+        for (const study of studies) {
+          await set(ref(db, `caseStudies/${study.id}`), study);
+        }
+        return studies;
+      }
+    }
+  } catch (err) {
+    console.error("Error reading case studies from Firebase in API route", err);
+    // Fallback to local JSON file
+    if (fs.existsSync(dbPath)) {
+      try {
+        const fileContent = fs.readFileSync(dbPath, "utf-8");
+        return JSON.parse(fileContent);
+      } catch (fileErr) {
+        console.error("Error reading case studies file fallback in API route", fileErr);
+      }
+    }
   }
-  const fileContent = fs.readFileSync(dbPath, "utf-8");
-  return JSON.parse(fileContent);
-}
-
-function writeCaseStudies(data: any[]) {
-  fs.writeFileSync(dbPath, JSON.stringify(data, null, 2), "utf-8");
+  return [];
 }
 
 function isAdmin(request: Request) {
@@ -23,7 +49,7 @@ function isAdmin(request: Request) {
 
 export async function GET(request: Request) {
   try {
-    const studies = readCaseStudies();
+    const studies = await getCaseStudiesFromDb();
     const admin = isAdmin(request);
     
     // If not admin, only return published ones
@@ -68,7 +94,7 @@ export async function POST(request: Request) {
       );
     }
     
-    const studies = readCaseStudies();
+    const studies = await getCaseStudiesFromDb();
     const slug = title
       .toLowerCase()
       .trim()
@@ -103,8 +129,7 @@ export async function POST(request: Request) {
       comments: []
     };
     
-    studies.push(newStudy);
-    writeCaseStudies(studies);
+    await set(ref(db, `caseStudies/${newStudy.id}`), newStudy);
     
     return NextResponse.json({ success: true, caseStudy: newStudy });
   } catch (error: any) {
@@ -146,7 +171,7 @@ export async function PUT(request: Request) {
       );
     }
     
-    const studies = readCaseStudies();
+    const studies = await getCaseStudiesFromDb();
     const index = studies.findIndex((s: any) => s.id === id);
     
     if (index === -1) {
@@ -168,7 +193,7 @@ export async function PUT(request: Request) {
         .replace(/(^-|-$)+/g, "");
     }
     
-    studies[index] = {
+    const updatedStudy = {
       ...currentStudy,
       slug: newSlug,
       title: title ?? currentStudy.title,
@@ -186,9 +211,16 @@ export async function PUT(request: Request) {
       status: status ?? currentStudy.status
     };
     
-    writeCaseStudies(studies);
+    if (updatedStudy.id !== id) {
+      // Delete the old node and write to the new one
+      await remove(ref(db, `caseStudies/${id}`));
+      updatedStudy.id = newSlug;
+      await set(ref(db, `caseStudies/${newSlug}`), updatedStudy);
+    } else {
+      await update(ref(db, `caseStudies/${id}`), updatedStudy);
+    }
     
-    return NextResponse.json({ success: true, caseStudy: studies[index] });
+    return NextResponse.json({ success: true, caseStudy: updatedStudy });
   } catch (error: any) {
     return NextResponse.json(
       { success: false, error: error.message || "Failed to update case study" },

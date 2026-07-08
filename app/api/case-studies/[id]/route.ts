@@ -1,19 +1,45 @@
 import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
+import { ref, get, set, remove } from "firebase/database";
+import { db } from "@/lib/firebase";
 
 const dbPath = path.join(process.cwd(), "lib", "case_studies.json");
 
-function readCaseStudies() {
-  if (!fs.existsSync(dbPath)) {
-    return [];
+async function getCaseStudiesFromDb() {
+  try {
+    const csRef = ref(db, "caseStudies");
+    const snapshot = await get(csRef);
+    if (snapshot.exists()) {
+      const data = snapshot.val();
+      return Object.keys(data).map(key => ({
+        id: key,
+        ...data[key]
+      }));
+    } else {
+      // Seed if database node is blank
+      if (fs.existsSync(dbPath)) {
+        const fileContent = fs.readFileSync(dbPath, "utf-8");
+        const studies = JSON.parse(fileContent);
+        for (const study of studies) {
+          await set(ref(db, `caseStudies/${study.id}`), study);
+        }
+        return studies;
+      }
+    }
+  } catch (err) {
+    console.error("Error reading case studies from Firebase in single study API", err);
+    // Fallback to local JSON file
+    if (fs.existsSync(dbPath)) {
+      try {
+        const fileContent = fs.readFileSync(dbPath, "utf-8");
+        return JSON.parse(fileContent);
+      } catch (fileErr) {
+        console.error("Error reading case studies file fallback in single study API", fileErr);
+      }
+    }
   }
-  const fileContent = fs.readFileSync(dbPath, "utf-8");
-  return JSON.parse(fileContent);
-}
-
-function writeCaseStudies(data: any[]) {
-  fs.writeFileSync(dbPath, JSON.stringify(data, null, 2), "utf-8");
+  return [];
 }
 
 function isAdmin(request: Request) {
@@ -29,7 +55,7 @@ export async function GET(
     const { id } = await params;
     const admin = isAdmin(request);
 
-    const studies = readCaseStudies();
+    const studies = await getCaseStudiesFromDb();
     const index = studies.findIndex((s: any) => s.id === id || s.slug === id);
 
     if (index === -1) {
@@ -62,14 +88,14 @@ export async function DELETE(
     }
 
     const { id } = await params;
-    const studies = readCaseStudies();
-    const filtered = studies.filter((s: any) => s.id !== id && s.slug !== id);
+    const studies = await getCaseStudiesFromDb();
+    const studyToDelete = studies.find((s: any) => s.id === id || s.slug === id);
 
-    if (studies.length === filtered.length) {
+    if (!studyToDelete) {
       return NextResponse.json({ success: false, error: "Case study not found" }, { status: 404 });
     }
 
-    writeCaseStudies(filtered);
+    await remove(ref(db, `caseStudies/${studyToDelete.id}`));
 
     return NextResponse.json({
       success: true,

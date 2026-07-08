@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Sora } from "next/font/google";
 import "./globals.css";
 
@@ -19,6 +19,12 @@ const sora = Sora({
 import { AnimationProvider } from "@/components/AnimationProvider";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { AuthProvider } from "@/lib/auth-context";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://texawave.com"),
@@ -71,7 +77,7 @@ export default function RootLayout({
     // Start with no dark class — ThemeProvider will apply "light" or "dark"
     // on the client after reading localStorage (default: light).
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} ${sora.variable} font-sans antialiased`}>
+      <body className={`${inter.variable} ${sora.variable} font-sans antialiased`} style={{ overflowX: "hidden", maxWidth: "100vw" }}>
         <ThemeProvider>
           <AuthProvider>
             <AnimationProvider>{children}</AnimationProvider>

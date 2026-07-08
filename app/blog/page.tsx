@@ -299,7 +299,7 @@ export default function BlogPage() {
         <div className="mx-auto w-full max-w-[1400px] px-[clamp(1rem,4vw,4rem)] relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="text-left">
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-small-text font-bold bg-[#8CC63F]/20 text-[#8CC63F] border border-[#8CC63F]/30 uppercase tracking-wider mb-4">
-              <Sparkles size={12} className="text-[#8CC63F]" /> Texawave Knowledge Base
+              Texawave Knowledge Base
             </span>
             <h1 className="max-w-4xl text-hero text-text-primary">
               Engineering <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#8CC63F] via-[#8CC63F] to-[#1E3A0E]">Insights</span>

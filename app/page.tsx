@@ -82,7 +82,12 @@ export default function Home() {
       .then((res) => res.json())
       .then((data) => {
         if (data.success) {
-          setCsList(data.caseStudies.slice(0, 3));
+          const featured = data.caseStudies.filter((s: any) => s.showOnHomepage === true);
+          if (featured.length > 0) {
+            setCsList(featured.slice(0, 3));
+          } else {
+            setCsList(data.caseStudies.slice(0, 3));
+          }
         }
       })
       .catch((err) => {
