@@ -414,9 +414,13 @@ export function TestimonialSlider() {
   // GSAP scroll trigger entries and count-up counters
   useGSAP(
     () => {
+      const container = statsContainerRef.current;
+      if (!container) return;
+      const fadeEls = container.querySelectorAll(".testimonial-fade-el");
+      if (!fadeEls.length) return;
       // Fade headings on scroll
       gsap.fromTo(
-        ".testimonial-fade-el",
+        fadeEls,
         { opacity: 0, y: 24 },
         {
           opacity: 1,
@@ -425,7 +429,7 @@ export function TestimonialSlider() {
           stagger: 0.15,
           ease: "power2.out",
           scrollTrigger: {
-            trigger: ".testimonial-scroll-trigger",
+            trigger: container,
             start: "top 85%",
             toggleActions: "play none none none",
           },

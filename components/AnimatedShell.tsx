@@ -9,27 +9,33 @@ export function AnimatedShell({ children }: { children: React.ReactNode }) {
 
   // Force ScrollTrigger to recalculate after all resources (fonts, images) load.
   useEffect(() => {
+    let timer: NodeJS.Timeout;
     const refresh = () => {
       requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          import("gsap/ScrollTrigger").then(({ ScrollTrigger }) => {
-            ScrollTrigger.refresh(true);
-          }).catch((err) => console.error("Failed to refresh ScrollTrigger dynamically:", err));
+        requestAnimationFrame(async () => {
+          try {
+            const { default: gsap } = await import("gsap");
+            const { ScrollTrigger } = await import("gsap/ScrollTrigger");
+            gsap.registerPlugin(ScrollTrigger);
+            if (ScrollTrigger.getAll().length > 0) {
+              ScrollTrigger.refresh(true);
+            }
+          } catch (err) {
+            console.error("Failed to refresh ScrollTrigger dynamically:", err);
+          }
         });
       });
     };
-
     if (document.readyState === "complete") {
-      const timer = setTimeout(refresh, 300);
-      return () => clearTimeout(timer);
+      timer = setTimeout(refresh, 300);
     } else {
       window.addEventListener("load", refresh, { once: true });
-      const timer = setTimeout(refresh, 1000);
-      return () => {
-        window.removeEventListener("load", refresh);
-        clearTimeout(timer);
-      };
+      timer = setTimeout(refresh, 1000);
     }
+    return () => {
+      window.removeEventListener("load", refresh);
+      clearTimeout(timer);
+    };
   }, []);
 
   useEffect(() => {
@@ -85,28 +91,35 @@ export function AnimatedShell({ children }: { children: React.ReactNode }) {
         });
 
         // Hero timeline elements entry
-        gsap.fromTo(
-          gsap.utils.toArray("[data-hero-line]", container),
-          { y: 34, autoAlpha: 0 },
-          { y: 0, autoAlpha: 1, duration: 0.9, stagger: 0.12, ease: "power3.out" }
-        );
-        
+        const heroLines = gsap.utils.toArray("[data-hero-line]", container);
+        if (heroLines.length > 0) {
+          gsap.fromTo(
+            heroLines,
+            { y: 34, autoAlpha: 0 },
+            { y: 0, autoAlpha: 1, duration: 0.9, stagger: 0.12, ease: "power3.out" }
+          );
+        }
         // Floating animations
-        gsap.to(gsap.utils.toArray("[data-hero-visual]", container), {
-          y: -16,
-          rotate: 1.5,
-          duration: 4,
-          repeat: -1,
-          yoyo: true,
-          ease: "sine.inOut"
-        });
-        
-        gsap.to(gsap.utils.toArray("[data-trace]", container), {
-          strokeDashoffset: 0,
-          duration: 2.2,
-          stagger: 0.12,
-          ease: "power2.out"
-        });
+        const heroVisuals = gsap.utils.toArray("[data-hero-visual]", container);
+        if (heroVisuals.length> 0) {
+          gsap.to(heroVisuals, {
+            y: -16,
+            rotate: 1.5,
+            duration: 4,
+            repeat: -1,
+            yoyo: true,
+            ease: "sine.inOut"
+          });
+        }
+        const traces = gsap.utils.toArray("[data-trace]", container);
+        if (traces.length > 0) {
+          gsap.to(traces, {
+            strokeDashoffset: 0,
+            duration: 2.2,
+            stagger: 0.12,
+            ease: "power2.out"
+          });
+        }
 
         // Stepper scroll progress
         gsap.utils.toArray<HTMLElement>("[data-step]", container).forEach((element) => {
@@ -272,8 +285,15 @@ export function AnimatedShell({ children }: { children: React.ReactNode }) {
   }, [hasLoadedSession, isTransitioning]);
 
   return (
-    <div ref={containerRef}>
-      {children}
+  <div
+  ref={containerRef}
+  style={{
+    opacity: hasLoadedSession ? 1 : 0,
+    visibility: hasLoadedSession ? "visible" : "hidden",
+    transition: "opacity 0.3s ease",
+  }}
+  >
+    {children}
     </div>
-  );
-}
+    );
+  }
