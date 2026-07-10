@@ -21,6 +21,7 @@ import {
   CheckCircle2,
   ChevronRight,
 } from "lucide-react";
+import { CheckList } from "@/components/CheckList";
 import { PageChrome } from "@/components/PageChrome";
 import { processSteps } from "@/lib/content";
 import type { MainService } from "@/lib/services-v2";
@@ -117,27 +118,24 @@ export function ServiceMainPage({ service }: { service: MainService }) {
               <p className="mb-4 text-small-text font-bold uppercase tracking-[0.15em] text-signal">
                 What we deliver
               </p>
-              <ul className="grid gap-3">
-                {service.highlights.map((item) => (
-                  <li key={item} className="flex items-start gap-2.5 text-body-normal font-semibold text-text-secondary">
-                    <CheckCircle2 className="mt-0.5 shrink-0 text-signal" size={15} />
-                    {item}
-                  </li>
-                ))}
-              </ul>
+              <CheckList items={service.highlights} />
 
               <div className="mt-6 pt-5 border-t border-border-primary">
                 <p className="text-xs text-text-secondary/60 font-medium uppercase tracking-widest mb-3">
                   Sub-services
                 </p>
-                <div className="grid gap-2">
+                <div className="grid gap-3.5">
                   {service.subServices.map((sub) => (
                     <Link
                       key={sub.slug}
                       href={`/${service.slug}/${sub.slug}`}
-                      className="flex items-center gap-2 text-[13px] font-medium text-text-secondary hover:text-signal transition-colors group"
+                      className="flex items-start gap-2.5 text-[14px] font-medium text-text-secondary hover:text-signal transition-colors group"
                     >
-                      <ArrowRight size={12} className="text-signal/50 group-hover:text-signal transition-colors" />
+                      <CheckCircle2
+                        size={16}
+                        className="shrink-0 mt-[2px] text-signal"
+                        aria-hidden="true"
+                      />
                       {sub.name}
                     </Link>
                   ))}

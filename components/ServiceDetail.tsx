@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { ArrowRight, CheckCircle2 } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import { CheckList } from "@/components/CheckList";
 import { PageChrome } from "@/components/PageChrome";
 import { processSteps, services } from "@/lib/content";
 
@@ -63,14 +64,7 @@ export function ServiceDetail({ slug }: { slug: string }) {
             <p className="mb-4 text-small-text font-bold uppercase tracking-[0.15em] text-signal">
               What we deliver
             </p>
-            <ul className="grid gap-2.5">
-              {service.deliverables.map((item) => (
-                <li key={item} className="flex items-start gap-2.5 text-body-normal font-semibold text-text-secondary">
-                  <CheckCircle2 className="mt-0.5 shrink-0 text-signal" size={15} />
-                  {item}
-                </li>
-              ))}
-            </ul>
+            <CheckList items={service.deliverables} />
           </div>
         </div>
       </section>

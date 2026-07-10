@@ -343,7 +343,7 @@ export default function BlogPage() {
             <div className="absolute top-0 right-0 w-64 h-64 bg-[#8CC63F]/5 rounded-full blur-3xl pointer-events-none" />
             <div>
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-small-text font-bold bg-[#8CC63F]/15 text-[#8CC63F] border border-[#8CC63F]/30 uppercase tracking-wider">
-                <Sparkles size={12} /> Share Your Knowledge
+                  Share Your Knowledge
                   </span>
                   <h3 className="mt-3 text-card text-text-primary font-bold">Have an Engineering Story or Project to share?</h3>
                   <p className="mt-2 text-text-secondary max-w-2xl text-body-normal">
