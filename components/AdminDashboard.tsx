@@ -53,6 +53,7 @@ export default function AdminDashboard() {
   // Case Studies Inputs
   const [csTitle, setCsTitle] = useState("");
   const [csCategory, setCsCategory] = useState("Mechanical Engineering");
+  const [csCategoryOther, setCsCategoryOther] = useState("");
   const [csHeroImage, setCsHeroImage] = useState("");
   const [csProblemStatement, setCsProblemStatement] = useState("");
   const [csChallenges, setCsChallenges] = useState("");
@@ -89,6 +90,7 @@ export default function AdminDashboard() {
   // Edit blog form fields
   const [editTitle, setEditTitle] = useState("");
   const [editCategory, setEditCategory] = useState("");
+  const [editCategoryOther, setEditCategoryOther] = useState("");
   const [editShortDesc, setEditShortDesc] = useState("");
   const [editContent, setEditContent] = useState("");
   const [editAuthorName, setEditAuthorName] = useState("");
@@ -532,10 +534,18 @@ export default function AdminDashboard() {
     }
   };
 
+  const predefinedCSCategories = ["Mechanical Engineering", "Electrical Engineering", "Software Engineering", "Procurement"];
+
   const handleEditCSClick = (cs: any) => {
     setEditingCS(cs);
     setCsTitle(cs.title);
-    setCsCategory(cs.category);
+    if (predefinedCSCategories.includes(cs.category)) {
+      setCsCategory(cs.category);
+      setCsCategoryOther("");
+    } else {
+      setCsCategory("Others");
+      setCsCategoryOther(cs.category);
+    }
     setCsHeroImage(cs.heroImage);
     setCsProblemStatement(cs.problemStatement);
     setCsChallenges(cs.challenges);
@@ -554,6 +564,7 @@ export default function AdminDashboard() {
     setEditingCS(null);
     setCsTitle("");
     setCsCategory("Mechanical Engineering");
+    setCsCategoryOther("");
     setCsHeroImage("");
     setCsProblemStatement("");
     setCsChallenges("");
@@ -580,7 +591,7 @@ export default function AdminDashboard() {
       id: csId,
       slug,
       title: csTitle,
-      category: csCategory,
+      category: csCategory === "Others" ? csCategoryOther : csCategory,
       heroImage: csHeroImage,
       problemStatement: csProblemStatement,
       challenges: csChallenges,
@@ -2383,7 +2394,17 @@ export default function AdminDashboard() {
                     <option value="Electrical Engineering">Electrical Engineering</option>
                     <option value="Software Engineering">Software Engineering</option>
                     <option value="Procurement">Procurement</option>
+                    <option value="Others">Others</option>
                   </select>
+                  {csCategory === "Others" && (
+                    <input
+                      type="text"
+                      value={csCategoryOther}
+                      onChange={(e) => setCsCategoryOther(e.target.value)}
+                      className="w-full mt-3 bg-bg-primary border border-[#8CC63F]/50 rounded-xl px-5 py-3.5 text-sm text-white focus:border-[#8CC63F] focus:outline-none placeholder:text-white/30"
+                      placeholder="Enter custom category..."
+                    />
+                  )}
                 </div>
               </div>
 
@@ -2706,7 +2727,17 @@ export default function AdminDashboard() {
                     {CATEGORIES.slice(1).map(cat => (
                       <option key={cat} value={cat}>{cat}</option>
                     ))}
+                    <option value="Others">Others</option>
                   </select>
+                  {editCategory === "Others" && (
+                    <input
+                      type="text"
+                      value={editCategoryOther}
+                      onChange={(e) => setEditCategoryOther(e.target.value)}
+                      className="w-full mt-2 bg-[#080808] border border-[#8CC63F]/50 rounded-xl px-4 py-3 text-sm text-white focus:border-[#8CC63F] focus:outline-none placeholder:text-white/30"
+                      placeholder="Enter custom category..."
+                    />
+                  )}
                 </div>
 
                 {/* Status */}
