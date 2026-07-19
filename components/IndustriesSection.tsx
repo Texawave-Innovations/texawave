@@ -600,7 +600,8 @@ function IndustryCard({
       >
         <rect
           x="1" y="1"
-          width="calc(100% - 2)" height="calc(100% - 2)"
+          width="98%" 
+          height="98%"
           rx="15" ry="15"
           fill="none"
           stroke={industry.accent}

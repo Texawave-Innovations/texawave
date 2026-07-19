@@ -663,7 +663,7 @@ export function CandidateView({
                       value={formName}
                       onChange={(e) => setFormName(e.target.value)}
                       className="w-full bg-bg-primary border border-border-primary focus:border-signal focus:outline-none rounded-lg px-3 py-2 text-body-normal text-text-primary"
-                      placeholder="e.g., Jane Doe"
+                      placeholder="Your Full Name"
                     />
                   </div>
 
@@ -677,7 +677,7 @@ export function CandidateView({
                         value={formEmail}
                         onChange={(e) => setFormEmail(e.target.value)}
                         className="w-full bg-bg-primary border border-border-primary focus:border-signal focus:outline-none rounded-lg px-3 py-2 text-body-normal text-text-primary"
-                        placeholder="yourname@domain.com"
+                        placeholder="yourname@gmail.com"
                       />
                     </div>
                     <div>
@@ -730,7 +730,7 @@ export function CandidateView({
                       onChange={(e) => setFormMessage(e.target.value)}
                       rows={3}
                       className="w-full bg-bg-primary border border-border-primary focus:border-signal focus:outline-none rounded-lg px-3 py-2 text-body-normal text-text-primary resize-none"
-                      placeholder="Briefly share any projects, hardware lab experience, or details you want to highlight..."
+                      placeholder="Briefly share relevant projects, skills, or experience you'd like us to know about"
                     />
                   </div>
 

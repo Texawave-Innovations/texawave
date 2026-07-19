@@ -4,7 +4,6 @@ import { useRef, useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import {
   ArrowRight,
-  CheckCircle2,
   Code2,
   Cpu,
   Cog,
@@ -13,6 +12,7 @@ import {
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
+import { CheckList } from "@/components/CheckList";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -465,23 +465,11 @@ function EngineeringTile({
           style={{ background: "rgba(140,198,63,0.15)", opacity: isHovered ? 1 : 0.5 }}
         />
 
-        {/* Capabilities */}
-        <ul className="space-y-2 mb-5">
-          {discipline.capabilities.map((cap, i) => (
-            <li
-              key={i}
-              className="eng-tile-cap-item flex items-start gap-2.5 text-[14px] font-medium transition-colors duration-300"
-              style={{ color: isHovered ? "rgba(225,225,225,0.95)" : "rgba(180,180,180,0.8)" }}
-            >
-              <CheckCircle2
-                size={16}
-                className="shrink-0 mt-[3px] transition-opacity duration-300"
-                style={{ color: "#8CC63F", opacity: isHovered ? 1 : 0.75 }}
-              />
-              {cap}
-            </li>
-          ))}
-        </ul>
+        <CheckList
+          items={discipline.capabilities}
+          className="mb-5"
+          itemClassName={isHovered ? "text-[rgba(225,225,225,0.95)]" : "text-[rgba(180,180,180,0.8)]"}
+        />
 
         {/* CTA */}
         <div
@@ -564,14 +552,11 @@ function MobileTile({ discipline, index }: { discipline: (typeof DISCIPLINES)[0]
         <div className="px-5 pb-5">
           <div className="h-px mb-4" style={{ background: "rgba(140,198,63,0.12)" }} />
           <p className="eng-mobile-tile-desc text-[#374151] dark:text-neutral-300 text-[15px] leading-relaxed mb-4">{discipline.shortDesc}</p>
-          <ul className="space-y-2.5 mb-5">
-            {discipline.capabilities.map((cap, i) => (
-              <li key={i} className="eng-mobile-tile-cap-item flex items-start gap-2.5 text-[14px] text-[#374151] dark:text-neutral-200 font-medium">
-                <CheckCircle2 size={16} className="shrink-0 mt-[3px]" style={{ color: "#8CC63F" }} />
-                {cap}
-              </li>
-            ))}
-          </ul>
+            <CheckList
+              items={discipline.capabilities}
+              className="mb-5"
+              itemClassName="text-[rgba(180,180,180,0.8)]"
+            />
           <Link
             href={`/${discipline.slug}`}
             className="inline-flex items-center gap-1.5 text-[14px] font-bold"
@@ -789,14 +774,11 @@ export function EngineeringExcellence() {
                   </div>
                 </div>
                 <p className="eng-tile-desc text-[15px] leading-relaxed mb-3" style={{ color: "rgba(180,180,180,0.85)" }}>{d.shortDesc}</p>
-                <ul className="space-y-2 mb-4">
-                  {d.capabilities.map((cap, ci) => (
-                    <li key={ci} className="eng-tile-cap-item flex items-start gap-2.5 text-[14px]" style={{ color: "rgba(180,180,180,0.8)" }}>
-                      <CheckCircle2 size={16} className="shrink-0 mt-[3px]" style={{ color: "#8CC63F" }} />
-                      {cap}
-                    </li>
-                  ))}
-                </ul>
+                <CheckList
+                  items={d.capabilities}
+                  className="mb-4"
+                  itemClassName="text-[rgba(180,180,180,0.8)]"
+                />
                 <div
                   className="inline-flex items-center gap-1.5 text-[14px] font-bold"
                   style={{ color: "#8CC63F" }}

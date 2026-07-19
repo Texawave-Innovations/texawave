@@ -838,8 +838,8 @@ export default function AboutPage() {
                   <rect
                     x="1"
                     y="1"
-                    width="calc(100% - 2px)"
-                    height="calc(100% - 2px)"
+                    width="98%"
+                    height="98%"
                     rx="15"
                     fill="none"
                     stroke="#8CC63F"
