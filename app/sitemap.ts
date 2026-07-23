@@ -6,7 +6,7 @@ import path from "path";
 
 export const dynamic = "force-dynamic";
 
-const BASE_URL = "https://www.texawave.com";
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.texawave.com";
 
 async function getBlogSlugs(): Promise<string[]> {
   try {

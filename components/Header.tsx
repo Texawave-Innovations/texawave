@@ -59,7 +59,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: "Services", href: "/services", hasDropdown: true, isMega: true },
   { label: "Case Studies", href: "/case-studies" },
   { label: "Blog", href: "/blog" },
-  { label: "Resources", href: "/resources", hasDropdown: true },
+  { label: "Resources", href: "#", hasDropdown: true },
   { label: "Careers", href: "/careers" },
 ];
 
@@ -82,9 +82,9 @@ const MEGA_COLUMNS = [
   {
     title: "Engineering",
     items: [
-      { label: "Mechanical Design", href: "/mechanical-engineering", icon: Wrench },
+      { label: "Mechanical Design", href: "/product-engineering/industrial-mechanical-design", icon: Wrench },
       { label: "Product Development", href: "/services", icon: Layers },
-      { label: "CAD Services", href: "/mechanical-engineering", icon: PenTool },
+      { label: "CAD Services", href: "/product-engineering/industrial-mechanical-design", icon: PenTool },
       { label: "Reverse Engineering", href: "/services", icon: RotateCcw },
     ],
   },

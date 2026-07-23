@@ -30,7 +30,7 @@ const SERVICES = [
   },
   {
     id: "electrical",
-    slug: "electrical-engineering",
+    slug: "product-engineering/hardware-pcb",
     title: "Electrical Engineering",
     shortTitle: "Electrical",
     icon: Cpu,
@@ -46,7 +46,7 @@ const SERVICES = [
   },
   {
     id: "mechanical",
-    slug: "mechanical-engineering",
+    slug: "product-engineering/industrial-mechanical-design",
     title: "Mechanical Engineering",
     shortTitle: "Mechanical",
     icon: Cog,
