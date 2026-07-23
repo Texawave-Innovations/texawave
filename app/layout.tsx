@@ -27,7 +27,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://texawave.com"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://www.texawave.com"),
   alternates: {
     canonical: "/"
   },
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     template: "%s | Texawave"
   },
   verification: {
-    google: "HRlCDselZbyC5sxlKsfv9VA6BcHYY4PqFRR2fvs4Pq8",
+    google: "HY4i3n91cPgXioHEknKgwLAwxY__csrKyKCTpKhMU1w",
   },
   description:
     "TexaWave offers end-to-end product engineering, custom software, PCB layout design, and cloud IoT platform solutions for global startups and enterprises.",
@@ -53,7 +53,7 @@ export const metadata: Metadata = {
     title: "Texawave | From Idea to Market-Ready Hardware Product",
     description:
       "End-to-end hardware product development for startups, manufacturers, and product companies serving global markets.",
-    url: "https://texawave.com",
+    url: process.env.NEXT_PUBLIC_SITE_URL || "https://www.texawave.com",
     siteName: "Texawave",
     type: "website"
   },

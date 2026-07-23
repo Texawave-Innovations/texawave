@@ -1,8 +1,8 @@
 # Texawave
 
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://github.com/[YOUR_USERNAME]/texawave-website/actions)
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://github.com/Texawave-Innovations/texawave/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/[YOUR_USERNAME]/texawave-website/releases)
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/Texawave-Innovations/texawave/releases)
 
 > An end-to-end product engineering, custom software, PCB layout design, and cloud IoT platform solutions portal for startups and enterprises.
 
@@ -40,8 +40,8 @@ Follow these steps to set up the project locally:
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/[YOUR_USERNAME]/texawave-website.git
-   cd texawave-website
+   git clone https://github.com/Texawave-Innovations/texawave.git
+   cd texawave
    ```
 
 2. **Install dependencies:**
@@ -58,7 +58,7 @@ Follow these steps to set up the project locally:
    ```env
    NEXT_PUBLIC_FIREBASE_API_KEY=your-api-key
    NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project-id.firebaseapp.com
-   NEXT_PUBLIC_FIREBASE_DATABASE_URL=https://your-project-id-default-rtdb.firebaseio.com
+   NEXT_PUBLIC_FIREBASE_DATABASE_URL=https://texawave-website-default-rtdb.firebaseio.com
    NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
    NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-project-id.appspot.com
    NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
@@ -95,8 +95,7 @@ npm run analyze
 
 ### Preview
 
-![Texawave Portal Preview](path/to/screenshot-or-gif.gif)
-*(Placeholder: Add a screenshot or GIF of the active dashboard/home page here)*
+![Texawave Portal Preview](/hero_video_poster.webp)
 
 ---
 
@@ -120,12 +119,12 @@ We welcome contributions to Texawave! To contribute, follow these guidelines:
 
 ## 📄 License
 
-This project is open-source and licensed under the [MIT License](LICENSE).
+This project is open-source and licensed under the [MIT License](https://opensource.org/licenses/MIT).
 
 ---
 
 ## 👥 Authors & Contact
 
-* **Lead Maintainer**: [YOUR_NAME] - [@github_username](https://github.com/[YOUR_USERNAME])
-* **Project Link**: [https://github.com/[YOUR_USERNAME]/texawave-website](https://github.com/[YOUR_USERNAME]/texawave-website)
-* **Email Contact**: [your-email@example.com](mailto:your-email@example.com)
+* **Lead Maintainer**: Texawave Innovations - [@Texawave-Innovations](https://github.com/Texawave-Innovations)
+* **Project Link**: [https://github.com/Texawave-Innovations/texawave](https://github.com/Texawave-Innovations/texawave)
+* **Email Contact**: [contact@texawave.com](mailto:contact@texawave.com)

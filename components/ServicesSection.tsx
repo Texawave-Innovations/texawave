@@ -2,10 +2,11 @@
 
 import { useRef, useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, Code2, Cpu, Cog, Package, ChevronDown } from "lucide-react";
+import { ArrowRight, Code2, Cpu, Cog, Package, ChevronDown } from "lucide-react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
+import { CheckList } from "@/components/CheckList";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -29,7 +30,7 @@ const SERVICES = [
   },
   {
     id: "electrical",
-    slug: "electrical-engineering",
+    slug: "product-engineering/hardware-pcb",
     title: "Electrical Engineering",
     shortTitle: "Electrical",
     icon: Cpu,
@@ -45,7 +46,7 @@ const SERVICES = [
   },
   {
     id: "mechanical",
-    slug: "mechanical-engineering",
+    slug: "product-engineering/industrial-mechanical-design",
     title: "Mechanical Engineering",
     shortTitle: "Mechanical",
     icon: Cog,
@@ -244,14 +245,10 @@ function CapabilityCard({ service, visible, onClose, style }: CapCardProps) {
           {service?.desc}
         </p>
 
-        <ul className="space-y-2 mb-4">
-          {service?.capabilities.map((cap, i) => (
-            <li key={i} className="flex items-start gap-2 text-[13px] text-neutral-300 font-medium">
-              <CheckCircle2 size={14} className="shrink-0 mt-0.5" style={{ color: "#8CC63F" }} />
-              {cap}
-            </li>
-          ))}
-        </ul>
+        <CheckList
+          items={service?.capabilities ?? []}
+          itemClassName="text-neutral-300"
+        />
 
         <Link
           href={`/${service?.slug}`}
@@ -703,14 +700,11 @@ function MobileServiceCard({
           <div className="px-5 pb-5">
             <div className="w-full h-px mb-4" style={{ background: "rgba(140,198,63,0.15)" }} />
             <p className="text-neutral-400 text-sm leading-relaxed mb-4">{service.desc}</p>
-            <ul className="space-y-2.5 mb-5">
-              {service.capabilities.map((cap, i) => (
-                <li key={i} className="flex items-start gap-2 text-sm text-neutral-300 font-medium">
-                  <CheckCircle2 size={14} className="shrink-0 mt-0.5" style={{ color: "#8CC63F" }} />
-                  {cap}
-                </li>
-              ))}
-            </ul>
+            <CheckList
+              items={service.capabilities}
+              className="mb-5"
+              itemClassName="text-neutral-300"
+            />
             <Link
               href={`/${service.slug}`}
               className="inline-flex items-center gap-1.5 text-sm font-bold"
@@ -1066,14 +1060,10 @@ export function ServicesSection() {
                   </div>
                 </div>
                 <p className="text-neutral-400 text-[13px] leading-relaxed mb-3">{svc.desc}</p>
-                <ul className="space-y-1.5">
-                  {svc.capabilities.map((cap, i) => (
-                    <li key={i} className="flex items-start gap-1.5 text-[12px] text-neutral-300">
-                      <CheckCircle2 size={12} className="shrink-0 mt-0.5" style={{ color: "#8CC63F" }} />
-                      {cap}
-                    </li>
-                  ))}
-                </ul>
+                <CheckList
+                  items={svc.capabilities}
+                  itemClassName="text-neutral-300"
+                />
                 <Link
                   href={`/${svc.slug}`}
                   className="inline-flex items-center gap-1.5 text-[12px] font-bold mt-3"

@@ -1,98 +1,129 @@
-import type { MetadataRoute } from "next";
-import fs from "fs";
-import path from "path";
+import { MetadataRoute } from "next";
 import { ref, get } from "firebase/database";
 import { db } from "@/lib/firebase";
-import { MAIN_SERVICES, SUB_SERVICES } from "@/lib/services-v2";
+import fs from "fs";
+import path from "path";
 
-const BASE_URL = "https://texawave.com";
+export const dynamic = "force-dynamic";
 
-async function getCaseStudySlugs(): Promise<{ slug: string; updatedAt?: string }[]> {
-  try {
-    const snapshot = await get(ref(db, "caseStudies"));
-    if (snapshot.exists()) {
-      const data = snapshot.val();
-      return Object.keys(data)
-        .map(key => ({ id: key, ...data[key] }))
-        .filter((s: any) => s.status === "Published")
-        .map((s: any) => ({ slug: s.slug || s.id, updatedAt: s.updatedAt }));
-    }
-  } catch (err) {
-    console.error("sitemap: failed to read case studies from Firebase", err);
-  }
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.texawave.com";
 
-  // Fallback to the seed file so the sitemap still has entries if Firebase is unreachable
-  try {
-    const dbPath = path.join(process.cwd(), "lib", "case_studies.json");
-    if (fs.existsSync(dbPath)) {
-      const studies = JSON.parse(fs.readFileSync(dbPath, "utf-8"));
-      return studies
-        .filter((s: any) => s.status === "Published")
-        .map((s: any) => ({ slug: s.slug || s.id, updatedAt: s.updatedAt }));
-    }
-  } catch (err) {
-    console.error("sitemap: failed to read case studies fallback file", err);
-  }
-
-  return [];
-}
-
-async function getBlogSlugs(): Promise<{ slug: string; updatedAt?: string }[]> {
+async function getBlogSlugs(): Promise<string[]> {
   try {
     const snapshot = await get(ref(db, "blogs"));
     if (snapshot.exists()) {
       const data = snapshot.val();
       return Object.keys(data)
-        .map(key => ({ id: key, ...data[key] }))
-        .filter((p: any) => ["approved", "featured", "intern-spotlight"].includes(p.status))
-        .map((p: any) => ({ slug: p.slug || p.id, updatedAt: p.updatedAt || p.createdAt }));
+        .map((key) => {
+          const post = data[key];
+          return {
+            slug: post.slug || key,
+            status: post.status || "pending",
+          };
+        })
+        .filter(
+          (p) =>
+            p.status === "approved" ||
+            p.status === "featured" ||
+            p.status === "intern-spotlight"
+        )
+        .map((p) => p.slug);
     }
-  } catch (err) {
-    console.error("sitemap: failed to read blog posts from Firebase", err);
+  } catch (error) {
+    console.error("Error fetching blog slugs for sitemap:", error);
   }
+  return [];
+}
 
+async function getCaseStudySlugs(): Promise<string[]> {
+  try {
+    const csRef = ref(db, "caseStudies");
+    const snapshot = await get(csRef);
+    let studies: any[] = [];
+    if (snapshot.exists()) {
+      const data = snapshot.val();
+      studies = Object.keys(data).map((key) => ({
+        id: key,
+        ...data[key],
+      }));
+    } else {
+      const dbPath = path.join(process.cwd(), "lib", "case_studies.json");
+      if (fs.existsSync(dbPath)) {
+        const fileContent = fs.readFileSync(dbPath, "utf-8");
+        studies = JSON.parse(fileContent);
+      }
+    }
+    return studies
+      .filter((s) => s.status === "Published")
+      .map((s) => s.slug || s.id);
+  } catch (error) {
+    console.error("Error fetching case study slugs for sitemap:", error);
+    // Fallback to local file
+    try {
+      const dbPath = path.join(process.cwd(), "lib", "case_studies.json");
+      if (fs.existsSync(dbPath)) {
+        const fileContent = fs.readFileSync(dbPath, "utf-8");
+        const studies = JSON.parse(fileContent);
+        return studies
+          .filter((s: any) => s.status === "Published")
+          .map((s: any) => s.slug || s.id);
+      }
+    } catch (fileErr) {
+      console.error("Error reading fallback for case studies sitemap:", fileErr);
+    }
+  }
   return [];
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const now = new Date();
-
-  const staticRoutes: { path: string; priority: number; changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"] }[] = [
-    { path: "", priority: 1.0, changeFrequency: "weekly" },
-    { path: "/about", priority: 0.8, changeFrequency: "monthly" },
-    { path: "/services", priority: 0.9, changeFrequency: "monthly" },
-    { path: "/case-studies", priority: 0.8, changeFrequency: "weekly" },
-    { path: "/blog", priority: 0.8, changeFrequency: "weekly" },
-    { path: "/careers", priority: 0.6, changeFrequency: "weekly" },
-    { path: "/contact", priority: 0.7, changeFrequency: "monthly" },
+  const staticRoutes = [
+    "",
+    "/about",
+    "/blog",
+    "/case-studies",
+    "/careers",
+    "/contact",
+    "/services",
+    "/product-engineering",
+    "/manufacturing-support",
+    "/procurement",
+    "/software-iot",
   ];
 
-  // Main service hubs (e.g. /software-iot) and their sub-service pages (e.g. /software-iot/custom-erp)
-  const serviceRoutes = [
-    ...MAIN_SERVICES.map(s => ({ path: `/${s.slug}`, priority: 0.9, changeFrequency: "monthly" as const })),
-    ...SUB_SERVICES.map(s => ({ path: `/${s.fullSlug}`, priority: 0.7, changeFrequency: "monthly" as const })),
-  ];
+  const blogSlugs = await getBlogSlugs();
+  const caseStudySlugs = await getCaseStudySlugs();
 
-  const [caseStudies, blogPosts] = await Promise.all([getCaseStudySlugs(), getBlogSlugs()]);
+  const sitemapEntries: MetadataRoute.Sitemap = [];
 
-  return [
-    ...[...staticRoutes, ...serviceRoutes].map(({ path: p, priority, changeFrequency }) => ({
-      url: `${BASE_URL}${p}`,
-      lastModified: now,
-      changeFrequency,
-      priority,
-    })),
-    ...caseStudies.map(cs => ({
-      url: `${BASE_URL}/case-studies/${cs.slug}`,
-      lastModified: cs.updatedAt ? new Date(cs.updatedAt) : now,
-      changeFrequency: "monthly" as const,
+  // Add static routes
+  for (const route of staticRoutes) {
+    sitemapEntries.push({
+      url: `${BASE_URL}${route}`,
+      lastModified: new Date(),
+      changeFrequency: route === "" ? "daily" : "weekly",
+      priority: route === "" ? 1.0 : 0.8,
+    });
+  }
+
+  // Add dynamic blog posts
+  for (const slug of blogSlugs) {
+    sitemapEntries.push({
+      url: `${BASE_URL}/blog/${slug}`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
       priority: 0.6,
-    })),
-    ...blogPosts.map(bp => ({
-      url: `${BASE_URL}/blog/${bp.slug}`,
-      lastModified: bp.updatedAt ? new Date(bp.updatedAt) : now,
-      changeFrequency: "monthly" as const,
-      priority: 0.5,
-    })),
-  ];
+    });
+  }
+
+  // Add dynamic case studies
+  for (const slug of caseStudySlugs) {
+    sitemapEntries.push({
+      url: `${BASE_URL}/case-studies/${slug}`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.6,
+    });
+  }
+
+  return sitemapEntries;
 }

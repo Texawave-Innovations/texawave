@@ -28,13 +28,13 @@ export function BlogSubmitModal({ isOpen, onClose, onSubmit }: BlogSubmitModalPr
     organization: "",
     authorPhoto: "",
     title: "",
-    category: "Software",
+    category: "",
     coverImage: "",
     content: "",
     shortDescription: "",
-    domain: "Embedded Systems",
-    skills: "PLC, Embedded, PCB, Testing",
-    duration: "Jan 2026 – May 2026"
+    domain: "",
+    skills: "",
+    duration: ""
   });
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
@@ -108,13 +108,13 @@ export function BlogSubmitModal({ isOpen, onClose, onSubmit }: BlogSubmitModalPr
       organization: "",
       authorPhoto: "",
       title: "",
-      category: "Software",
+      category: "",
       coverImage: "",
       content: "",
       shortDescription: "",
-      domain: "Embedded Systems",
-      skills: "PLC, Embedded, PCB, Testing",
-      duration: "Jan 2026 – May 2026"
+      domain: "",
+      skills: "",
+      duration: ""
     });
     setFormErrors({});
   };
@@ -152,7 +152,7 @@ export function BlogSubmitModal({ isOpen, onClose, onSubmit }: BlogSubmitModalPr
                 <User className="absolute left-3 top-3.5 text-text-secondary" size={16} />
                 <input
                   type="text"
-                  placeholder="e.g. Alexander Chen"
+                  placeholder="Your full name"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   className="w-full bg-bg-primary border border-border-primary text-text-primary focus:border-[#8CC63F] outline-none rounded-xl py-3 pl-10 pr-4 text-sm transition"
@@ -170,7 +170,7 @@ export function BlogSubmitModal({ isOpen, onClose, onSubmit }: BlogSubmitModalPr
                 <Mail className="absolute left-3 top-3.5 text-text-secondary" size={16} />
                 <input
                   type="email"
-                  placeholder="e.g. alex@aerotech.com"
+                  placeholder="you@company.com"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   className="w-full bg-bg-primary border border-border-primary text-text-primary focus:border-[#8CC63F] outline-none rounded-xl py-3 pl-10 pr-4 text-sm transition"
@@ -189,6 +189,9 @@ export function BlogSubmitModal({ isOpen, onClose, onSubmit }: BlogSubmitModalPr
                 onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                 className="w-full bg-bg-primary border border-border-primary text-text-primary focus:border-[#8CC63F] outline-none rounded-xl py-3 px-4 text-sm transition"
               >
+                <option value="" disabled className="bg-bg-secondary text-text-secondary">
+                  Select Category
+                </option>
                 {CATEGORIES.map((cat) => (
                   <option key={cat} value={cat} className="bg-bg-secondary text-text-primary">
                     {cat}
@@ -206,7 +209,7 @@ export function BlogSubmitModal({ isOpen, onClose, onSubmit }: BlogSubmitModalPr
                 <Building2 className="absolute left-3 top-3.5 text-text-secondary" size={16} />
                 <input
                   type="text"
-                  placeholder={formData.category === "Internship" ? "e.g. IIT Madras" : "e.g. Stanford University / Texawave"}
+                  placeholder={formData.category === "Internship" ? "Your college name" : "Your company or university"}
                   value={formData.organization}
                   onChange={(e) => setFormData({ ...formData, organization: e.target.value })}
                   className="w-full bg-bg-primary border border-border-primary text-text-primary focus:border-[#8CC63F] outline-none rounded-xl py-3 pl-10 pr-4 text-sm transition"
@@ -225,7 +228,7 @@ export function BlogSubmitModal({ isOpen, onClose, onSubmit }: BlogSubmitModalPr
                   <label className="block text-[10px] font-bold text-text-primary uppercase mb-2">Domain Badge</label>
                   <input
                     type="text"
-                    placeholder="e.g. Embedded Systems"
+                    placeholder="e.g. Web Development"
                     value={formData.domain}
                     onChange={(e) => setFormData({ ...formData, domain: e.target.value })}
                     className="w-full bg-bg-primary border border-border-primary text-text-primary text-xs focus:border-[#8CC63F] outline-none rounded-lg py-2 px-3 transition"
@@ -235,7 +238,7 @@ export function BlogSubmitModal({ isOpen, onClose, onSubmit }: BlogSubmitModalPr
                   <label className="block text-[10px] font-bold text-text-primary uppercase mb-2">Skills (Comma Split)</label>
                   <input
                     type="text"
-                    placeholder="e.g. PLC, Embedded, PCB"
+                    placeholder="e.g. React, Git, Figma"
                     value={formData.skills}
                     onChange={(e) => setFormData({ ...formData, skills: e.target.value })}
                     className="w-full bg-bg-primary border border-border-primary text-text-primary text-xs focus:border-[#8CC63F] outline-none rounded-lg py-2 px-3 transition"
@@ -245,7 +248,7 @@ export function BlogSubmitModal({ isOpen, onClose, onSubmit }: BlogSubmitModalPr
                   <label className="block text-[10px] font-bold text-text-primary uppercase mb-2">Duration</label>
                   <input
                     type="text"
-                    placeholder="e.g. Jan 2026 – May 2026"
+                    placeholder="e.g. Jan – Mar 2026"
                     value={formData.duration}
                     onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
                     className="w-full bg-bg-primary border border-border-primary text-text-primary text-xs focus:border-[#8CC63F] outline-none rounded-lg py-2 px-3 transition"
@@ -264,7 +267,7 @@ export function BlogSubmitModal({ isOpen, onClose, onSubmit }: BlogSubmitModalPr
               <FileText className="absolute left-3 top-3.5 text-text-secondary" size={16} />
               <input
                 type="text"
-                placeholder="e.g. Design Considerations for High-Frequency PCBs"
+                placeholder="e.g. What I learned building my first side project"
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 className="w-full bg-bg-primary border border-border-primary text-text-primary focus:border-[#8CC63F] outline-none rounded-xl py-3 pl-10 pr-4 text-sm transition"
@@ -280,7 +283,7 @@ export function BlogSubmitModal({ isOpen, onClose, onSubmit }: BlogSubmitModalPr
             </label>
             <textarea
               rows={2}
-              placeholder="e.g. A brief overview of the article contents for the preview cards..."
+              placeholder="e.g. A quick summary of what this article covers and who it's for"
               value={formData.shortDescription}
               onChange={(e) => setFormData({ ...formData, shortDescription: e.target.value })}
               className="w-full bg-bg-primary border border-border-primary text-text-primary focus:border-[#8CC63F] outline-none rounded-xl p-3 text-sm transition"
@@ -423,7 +426,7 @@ export function BlogSubmitModal({ isOpen, onClose, onSubmit }: BlogSubmitModalPr
             <textarea
               id="blog-content-textarea"
               rows={8}
-              placeholder="Start writing your rich-text article... You can use HTML tags or the formatting buttons above."
+              placeholder="Share your story, insights, or how-to guide here."
               value={formData.content}
               onChange={(e) => setFormData({ ...formData, content: e.target.value })}
               className="w-full bg-bg-primary border border-border-primary text-text-primary focus:border-[#8CC63F] outline-none rounded-b-xl p-4 text-sm transition font-sans leading-relaxed"

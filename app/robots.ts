@@ -1,14 +1,27 @@
 import type { MetadataRoute } from "next";
 
-const BASE_URL = "https://texawave.com";
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.texawave.com";
 
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: ["/admin", "/dashboard", "/hr", "/login", "/profile", "/api"],
+      disallow: [
+        "/admin",
+        "/admin/",
+        "/dashboard",
+        "/dashboard/",
+        "/login",
+        "/login/",
+        "/hr",
+        "/hr/",
+        "/profile",
+        "/profile/",
+        "/api",
+        "/api/",
+      ],
     },
-    sitemap: `${BASE_URL}/sitemap.xml`,
+    sitemap: "https://www.texawave.com/sitemap.xml",
   };
 }

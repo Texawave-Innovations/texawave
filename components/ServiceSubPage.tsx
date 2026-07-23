@@ -18,9 +18,9 @@ import {
   Repeat,
   ShieldCheck,
   Gauge,
-  CheckCircle2,
   ChevronRight,
 } from "lucide-react";
+import { CheckList } from "@/components/CheckList";
 import { PageChrome } from "@/components/PageChrome";
 import type { SubService } from "@/lib/services-v2";
 
@@ -122,14 +122,7 @@ export function ServiceSubPage({ sub }: { sub: SubService }) {
               <p className="mb-4 text-small-text font-bold uppercase tracking-[0.15em] text-signal">
                 Key highlights
               </p>
-              <ul className="grid gap-3">
-                {sub.highlights.map((item) => (
-                  <li key={item} className="flex items-start gap-2.5 text-body-normal font-semibold text-text-secondary">
-                    <CheckCircle2 className="mt-0.5 shrink-0 text-signal" size={15} />
-                    {item}
-                  </li>
-                ))}
-              </ul>
+              <CheckList items={sub.highlights} />
               <div className="mt-6 pt-5 border-t border-border-primary">
                 <Link
                   href="/contact"

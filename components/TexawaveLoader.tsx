@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
-import { AlertTriangle, WifiOff, RefreshCw } from "lucide-react";
 
 interface TexawaveLoaderProps {
   onComplete: () => void;
@@ -20,73 +19,28 @@ const LOADING_MESSAGES = [
 export function TexawaveLoader({ onComplete }: TexawaveLoaderProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const logoWrapperRef = useRef<HTMLDivElement>(null);
-  const barFillRef = useRef<HTMLDivElement>(null);
-
+  
   // Connection and timing states
-  const [isOnline, setIsOnline] = useState(true);
-  const [status, setStatus] = useState<"loading" | "slow" | "offline">("loading");
-  const [dismissedSlow, setDismissedSlow] = useState(false);
   const [messageIndex, setMessageIndex] = useState(0);
   const [isReady, setIsReady] = useState(false); // Page ready state
   const [minTimeElapsed, setMinTimeElapsed] = useState(false); // Min time elapsed
   const [isExiting, setIsExiting] = useState(false);
 
-  // Sync isOnline with browser window status
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      setIsOnline(navigator.onLine);
-
-      const handleOnline = () => {
-        setIsOnline(true);
-        // Transition back to loading when connection is restored
-        setStatus("loading");
-      };
-
-      const handleOffline = () => {
-        setIsOnline(false);
-        setStatus("offline");
-      };
-
-      window.addEventListener("online", handleOnline);
-      window.addEventListener("offline", handleOffline);
-
-      return () => {
-        window.removeEventListener("online", handleOnline);
-        window.removeEventListener("offline", handleOffline);
-      };
-    }
-  }, []);
-
   // Handle message cycling when in loading status
   useEffect(() => {
-    if (status !== "loading") return;
-
     const interval = setInterval(() => {
       setMessageIndex(prev => (prev + 1) % LOADING_MESSAGES.length);
     }, 1500);
-
+    
     return () => clearInterval(interval);
-  }, [status]);
-
-  // Handle Slow Network Timer (5 seconds)
-  useEffect(() => {
-    if (isReady || dismissedSlow || status === "offline") return;
-
-    const slowTimer = setTimeout(() => {
-      if (isOnline && !isReady) {
-        setStatus("slow");
-      }
-    }, 5000);
-
-    return () => clearTimeout(slowTimer);
-  }, [isReady, dismissedSlow, isOnline, status]);
+  }, []);
 
   // Handle Minimum Display Time (2 seconds)
   useEffect(() => {
     const minTimer = setTimeout(() => {
       setMinTimeElapsed(true);
     }, 2000);
-
+    
     return () => clearTimeout(minTimer);
   }, []);
 
@@ -106,56 +60,34 @@ export function TexawaveLoader({ onComplete }: TexawaveLoaderProps) {
     }
   }, []);
 
-  // Animate progress bar fill while loading
-  useGSAP(() => {
-    if (!barFillRef.current) return;
-
-    if (status === "loading") {
-      gsap.to(barFillRef.current, {
-        width: isReady ? "100%" : "82%",
-        duration: isReady ? 0.4 : 2.6,
-        ease: isReady ? "power2.out" : "power1.out",
-      });
-    }
-  }, { dependencies: [status, isReady] });
-
   // Monitor when to trigger exit animation
   useGSAP(() => {
-    if (isReady && minTimeElapsed && status !== "offline" && !isExiting) {
+    if (isReady && minTimeElapsed && !isExiting) {
       setIsExiting(true);
-
+      
       const tl = gsap.timeline({
         onComplete: () => {
           onComplete();
         }
       });
-
+      
       // Scale logo slightly upward, fade loader opacity to 0
       tl.to(logoWrapperRef.current, {
-        scale: 1.06,
+        scale: 1.12,
         opacity: 0,
-        duration: 0.6,
+        duration: 0.7,
         ease: "power3.inOut"
       });
-
+      
       tl.to(containerRef.current, {
         opacity: 0,
-        duration: 0.6,
+        duration: 0.7,
         ease: "power3.inOut"
-      }, 0.1);
+      }, 0);
     }
-  }, { dependencies: [isReady, minTimeElapsed, status, isExiting] });
-
-  // Handle reload action
-  const handleReload = () => {
-    window.location.reload();
-  };
-
-  // Handle continue waiting action
-  const handleContinueWaiting = () => {
-    setDismissedSlow(true);
-    setStatus("loading");
-  };
+  }, { dependencies: [isReady, minTimeElapsed, isExiting] });
+  
+  const statusColor = "#8CC63F";
 
   return (
     <div
@@ -164,40 +96,33 @@ export function TexawaveLoader({ onComplete }: TexawaveLoaderProps) {
       aria-hidden="true"
     >
       <style>{`
-        @keyframes drift-glow {
-          0%, 100% { transform: translate(-50%, -50%) scale(1); }
-          50% { transform: translate(-50%, -50%) scale(1.08); }
+        @keyframes spin-ring {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
         }
-        @keyframes logo-breathe {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.75; }
+        @keyframes subtle-pulse {
+          0%, 100% { transform: scale(1); opacity: 0.85; }
+          50% { transform: scale(1.03); opacity: 1; }
         }
         @keyframes fade-in-up {
-          from { opacity: 0; transform: translateY(6px); }
+          from { opacity: 0; transform: translateY(8px); }
           to { opacity: 1; transform: translateY(0); }
         }
-        @keyframes shimmer-sweep {
-          0% { transform: translateX(-100%); }
-          100% { transform: translateX(250%); }
+        @keyframes pulse-dot {
+          0%, 100% { opacity: 0.6; transform: scale(0.9); }
+          50% { opacity: 1; transform: scale(1.1); }
         }
-        .ambient-glow {
-          animation: drift-glow 4s ease-in-out infinite;
+        .rotate-ring {
+          animation: spin-ring 2.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
         }
-        .logo-breathe {
-          animation: logo-breathe 2.4s ease-in-out infinite;
+        .pulse-logo {
+          animation: subtle-pulse 3s ease-in-out infinite;
         }
         .fade-in-up-msg {
-          animation: fade-in-up 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          animation: fade-in-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
-        .shimmer-sweep::after {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          height: 100%;
-          width: 40%;
-          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.55), transparent);
-          animation: shimmer-sweep 1.6s ease-in-out infinite;
+        .dot-glowing {
+          animation: pulse-dot 2s infinite ease-in-out;
         }
         .premium-glass-card {
           background: rgba(10, 10, 10, 0.6);
@@ -228,9 +153,10 @@ export function TexawaveLoader({ onComplete }: TexawaveLoaderProps) {
 
       {/* ── Ambient Radial Glow ── */}
       <div
-        className="ambient-glow absolute w-[480px] h-[480px] rounded-full blur-3xl pointer-events-none opacity-20"
+        className="absolute w-[450px] h-[450px] rounded-full blur-3xl pointer-events-none opacity-20 transition-all duration-1000"
         style={{
-          background: "radial-gradient(circle, #8CC63F 0%, transparent 70%)",
+          background: `radial-gradient(circle, ${statusColor} 0%, transparent 70%)`,
+          transform: "translate(-50%, -50%)",
           left: "50%",
           top: "50%",
         }}
@@ -238,85 +164,66 @@ export function TexawaveLoader({ onComplete }: TexawaveLoaderProps) {
 
       {/* ── Main Loading Content Wrapper ── */}
       <div ref={logoWrapperRef} className="flex flex-col items-center justify-center z-10 px-6 max-w-md w-full text-center">
+        
+        {/* ── Logo & Progress Ring Area ── */}
+        <div className="relative flex items-center justify-center w-52 h-52 mb-8">
+          {/* Circular Progress Ring */}
+          <svg
+            viewBox="0 0 100 100"
+            className="absolute inset-0 w-full h-full rotate-ring"
+          >
+            {/* Background Track */}
+            <circle
+              cx="50"
+              cy="50"
+              r="44"
+              fill="none"
+              stroke="rgba(255, 255, 255, 0.03)"
+              strokeWidth="2.5"
+            />
+            {/* Active Segment */}
+            <circle
+              cx="50"
+              cy="50"
+              r="44"
+              fill="none"
+              stroke={statusColor}
+              strokeWidth="2.5"
+              strokeDasharray="276.4"
+              strokeDashoffset="180"
+              strokeLinecap="round"
+              className="transition-all duration-700 ease-in-out"
+              style={{
+                filter: `drop-shadow(0 0 4px ${statusColor}a0)`
+              }}
+            />
+          </svg>
 
-        {/* ── Logo ── */}
-        <div className="logo-breathe relative z-10 w-40 h-24 flex items-center justify-center mb-10">
-          <Image
-            src="/texawave_logo.webp"
-            alt="Texawave"
-            width={180}
-            height={56}
-            className="h-12 w-auto object-contain"
-            priority
-          />
+          {/* Pulsing Texawave Logo inside the ring */}
+          <div className="relative z-10 w-36 h-20 flex items-center justify-center pulse-logo">
+            <Image
+              src="/texawave_logo.webp"
+              alt="Texawave"
+              width={160}
+              height={50}
+              className="h-10 w-auto object-contain"
+              priority
+            />
+          </div>
         </div>
 
         {/* ── Messages & Controls Container ── */}
-        <div className="min-h-36 flex flex-col items-center justify-start w-full">
-          {status === "loading" && (
-            <div className="w-full flex flex-col items-center">
-              {/* Progress bar */}
-              <div className="relative w-56 h-[3px] rounded-full bg-white/10 overflow-hidden">
-                <div
-                  ref={barFillRef}
-                  className="shimmer-sweep relative h-full rounded-full bg-[#8CC63F]"
-                  style={{ width: "8%", boxShadow: "0 0 8px #8CC63Fa0" }}
-                />
-              </div>
-
-              <div key={messageIndex} className="fade-in-up-msg mt-5">
-                <p className="text-[#999999] text-xs font-medium tracking-[0.15em] uppercase font-sans">
-                  {LOADING_MESSAGES[messageIndex]}
-                </p>
-              </div>
-            </div>
-          )}
-
-          {status === "slow" && (
-            <div className="fade-in-up-msg w-full flex flex-col items-center premium-glass-card p-5 rounded-xl border border-white/5">
-              <div className="flex items-center gap-2 text-yellow-500 mb-2">
-                <AlertTriangle size={18} className="animate-pulse" />
-                <span className="font-bold text-sm uppercase tracking-wider">Slow Network Detected</span>
-              </div>
-              <p className="text-[#999999] text-xs leading-relaxed max-w-xs mb-4">
-                Your connection appears to be slow. We&apos;re still preparing the experience.
+        <div className="h-36 flex flex-col items-center justify-start w-full">
+            <div key={messageIndex} className="fade-in-up-msg flex flex-col items-center">
+              <p className="text-black dark:text-white text-base font-semibold tracking-wide font-sans mb-1">
+                {LOADING_MESSAGES[messageIndex]}
               </p>
-              <div className="flex gap-3 w-full">
-                <button
-                  onClick={handleReload}
-                  className="premium-btn flex-1 py-2 px-3 rounded bg-white text-black font-bold text-xs flex items-center justify-center gap-1.5 border border-white"
-                >
-                  <RefreshCw size={12} />
-                  Retry Connection
-                </button>
-                <button
-                  onClick={handleContinueWaiting}
-                  className="premium-btn flex-1 py-2 px-3 rounded bg-transparent text-white font-bold text-xs border border-white/10 hover:border-white/30"
-                >
-                  Continue Waiting
-                </button>
+              <div className="flex gap-1 items-center justify-center mt-3">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#8CC63F]/60 animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                <span className="w-1.5 h-1.5 rounded-full bg-[#8CC63F]/80 animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                <span className="w-1.5 h-1.5 rounded-full bg-[#8CC63F] animate-bounce" style={{ animationDelay: '300ms' }}></span>
               </div>
             </div>
-          )}
-
-          {status === "offline" && (
-            <div className="fade-in-up-msg w-full flex flex-col items-center premium-glass-card p-5 rounded-xl border border-white/5">
-              <div className="flex items-center gap-2 text-red-500 mb-2">
-                <WifiOff size={18} />
-                <span className="font-bold text-sm uppercase tracking-wider">No Internet Connection</span>
-              </div>
-              <p className="text-[#999999] text-xs leading-relaxed max-w-xs mb-4">
-                We&apos;re unable to connect to the network. Please check your internet connection.
-              </p>
-              <button
-                onClick={handleReload}
-                className="premium-btn w-full py-2 px-3 rounded bg-red-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 border border-red-500 shadow-lg shadow-red-500/20"
-              >
-                <RefreshCw size={12} />
-                Retry Connection
-              </button>
-            </div>
-          )}
         </div>
       </div>
     </div>

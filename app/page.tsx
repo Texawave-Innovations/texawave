@@ -303,8 +303,8 @@ export default function Home() {
 
                 {/* Headline */}
                 <h1 className="text-balance text-hero text-[#EEEEEE] font-black tracking-tight leading-[1.05] mt-6">
-                  <span className="hero-title-line block opacity-0" data-text="Transform Your Idea">Transform Your Idea</span>
-                  <span className="hero-title-line block text-[#8CC63F] opacity-0" data-text="into a Market-Ready Product">into a Market-Ready Product</span>
+                  <span className="hero-title-line block opacity-0" data-text="From Software to Product,">From Software to Product,</span>
+                  <span className="hero-title-line block text-[#8CC63F] opacity-0" data-text="We Build Market-Ready Solutions">We Build Market-Ready Solutions</span>
                 </h1>
 
                 {/* Supporting Text */}
